@@ -14,7 +14,162 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      cycles: {
+        Row: {
+          created_at: string
+          end_date: string | null
+          id: string
+          notes: string | null
+          start_date: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          notes?: string | null
+          start_date: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          notes?: string | null
+          start_date?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      daily_logs: {
+        Row: {
+          created_at: string
+          flow_intensity: string | null
+          id: string
+          log_date: string
+          notes: string | null
+          symptoms: string[]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          flow_intensity?: string | null
+          id?: string
+          log_date: string
+          notes?: string | null
+          symptoms?: string[]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          flow_intensity?: string | null
+          id?: string
+          log_date?: string
+          notes?: string | null
+          symptoms?: string[]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      mood_logs: {
+        Row: {
+          created_at: string
+          id: string
+          intensity: number | null
+          log_date: string
+          moods: string[]
+          notes: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          intensity?: number | null
+          log_date: string
+          moods?: string[]
+          notes?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          intensity?: number | null
+          log_date?: string
+          moods?: string[]
+          notes?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          id: string
+          locale: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          id: string
+          locale?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          locale?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_preferences: {
+        Row: {
+          average_cycle_length: number | null
+          average_period_length: number | null
+          created_at: string
+          locale: string
+          notifications_enabled: boolean
+          onboarding_completed: boolean
+          temperature_unit: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          average_cycle_length?: number | null
+          average_period_length?: number | null
+          created_at?: string
+          locale?: string
+          notifications_enabled?: boolean
+          onboarding_completed?: boolean
+          temperature_unit?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          average_cycle_length?: number | null
+          average_period_length?: number | null
+          created_at?: string
+          locale?: string
+          notifications_enabled?: boolean
+          onboarding_completed?: boolean
+          temperature_unit?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
