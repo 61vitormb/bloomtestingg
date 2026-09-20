@@ -16,6 +16,7 @@ import { Route as NovaSenhaRouteImport } from './routes/nova-senha'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
+import { Route as AuthenticatedAppAjustesRouteImport } from './routes/_authenticated/app.ajustes'
 import { Route as AuthenticatedAppCalendarioRouteImport } from './routes/_authenticated/app.calendario'
 import { Route as AuthenticatedAppHistoricoRouteImport } from './routes/_authenticated/app.historico'
 import { Route as AuthenticatedAppHumorRouteImport } from './routes/_authenticated/app.humor'
@@ -54,6 +55,11 @@ const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
+const AuthenticatedAppAjustesRoute = AuthenticatedAppAjustesRouteImport.update({
+  id: '/ajustes',
+  path: '/ajustes',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
 const AuthenticatedAppCalendarioRoute =
   AuthenticatedAppCalendarioRouteImport.update({
     id: '/calendario',
@@ -78,6 +84,7 @@ export interface FileRoutesByFullPath {
   '/nova-senha': typeof NovaSenhaRoute
   '/app': typeof AuthenticatedAppRouteWithChildren
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/app/ajustes': typeof AuthenticatedAppAjustesRoute
   '/app/calendario': typeof AuthenticatedAppCalendarioRoute
   '/app/historico': typeof AuthenticatedAppHistoricoRoute
   '/app/humor': typeof AuthenticatedAppHumorRoute
@@ -88,6 +95,7 @@ export interface FileRoutesByTo {
   '/entrar': typeof EntrarRoute
   '/nova-senha': typeof NovaSenhaRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/app/ajustes': typeof AuthenticatedAppAjustesRoute
   '/app/calendario': typeof AuthenticatedAppCalendarioRoute
   '/app/historico': typeof AuthenticatedAppHistoricoRoute
   '/app/humor': typeof AuthenticatedAppHumorRoute
@@ -101,6 +109,7 @@ export interface FileRoutesById {
   '/nova-senha': typeof NovaSenhaRoute
   '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
+  '/_authenticated/app/ajustes': typeof AuthenticatedAppAjustesRoute
   '/_authenticated/app/calendario': typeof AuthenticatedAppCalendarioRoute
   '/_authenticated/app/historico': typeof AuthenticatedAppHistoricoRoute
   '/_authenticated/app/humor': typeof AuthenticatedAppHumorRoute
@@ -114,6 +123,7 @@ export interface FileRouteTypes {
     | '/nova-senha'
     | '/app'
     | '/onboarding'
+    | '/app/ajustes'
     | '/app/calendario'
     | '/app/historico'
     | '/app/humor'
@@ -124,6 +134,7 @@ export interface FileRouteTypes {
     | '/entrar'
     | '/nova-senha'
     | '/onboarding'
+    | '/app/ajustes'
     | '/app/calendario'
     | '/app/historico'
     | '/app/humor'
@@ -136,6 +147,7 @@ export interface FileRouteTypes {
     | '/nova-senha'
     | '/_authenticated/app'
     | '/_authenticated/onboarding'
+    | '/_authenticated/app/ajustes'
     | '/_authenticated/app/calendario'
     | '/_authenticated/app/historico'
     | '/_authenticated/app/humor'
@@ -200,6 +212,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppIndexRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/app/ajustes': {
+      id: '/_authenticated/app/ajustes'
+      path: '/ajustes'
+      fullPath: '/app/ajustes'
+      preLoaderRoute: typeof AuthenticatedAppAjustesRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/app/calendario': {
       id: '/_authenticated/app/calendario'
       path: '/calendario'
@@ -225,6 +244,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAppRouteChildren {
+  AuthenticatedAppAjustesRoute: typeof AuthenticatedAppAjustesRoute
   AuthenticatedAppCalendarioRoute: typeof AuthenticatedAppCalendarioRoute
   AuthenticatedAppHistoricoRoute: typeof AuthenticatedAppHistoricoRoute
   AuthenticatedAppHumorRoute: typeof AuthenticatedAppHumorRoute
@@ -232,6 +252,7 @@ interface AuthenticatedAppRouteChildren {
 }
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
+  AuthenticatedAppAjustesRoute: AuthenticatedAppAjustesRoute,
   AuthenticatedAppCalendarioRoute: AuthenticatedAppCalendarioRoute,
   AuthenticatedAppHistoricoRoute: AuthenticatedAppHistoricoRoute,
   AuthenticatedAppHumorRoute: AuthenticatedAppHumorRoute,
