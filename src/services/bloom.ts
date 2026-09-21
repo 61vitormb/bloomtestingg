@@ -208,10 +208,10 @@ export async function updateCycle(
   id: string,
   input: { start_date?: string; end_date?: string | null; notes?: string | null },
 ): Promise<Cycle> {
-  const payload: Record<string, unknown> = {};
-  if (input.start_date !== undefined) payload["start_date"] = input.start_date;
-  if (input.end_date !== undefined) payload["end_date"] = input.end_date;
-  if (input.notes !== undefined) payload["notes"] = sanitizeNotes(input.notes);
+  const payload: { start_date?: string; end_date?: string | null; notes?: string | null } = {};
+  if (input.start_date !== undefined) payload.start_date = input.start_date;
+  if (input.end_date !== undefined) payload.end_date = input.end_date;
+  if (input.notes !== undefined) payload.notes = sanitizeNotes(input.notes);
   return unwrap(
     await supabase
       .from("cycles")
