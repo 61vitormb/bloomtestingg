@@ -4,11 +4,11 @@ import {
   averageCycleLength,
   averagePeriodLength,
   cycleLengths,
-  currentCycleDay,
   cycleVariability,
+  currentCycleDay,
   diffInDays,
-  nextPeriodPrediction,
-  phaseForCycleDay,
+  estimatePhase,
+  predictNextPeriod,
   predictedPeriodDays,
   validateCycleEntry,
   type CycleRecord,
@@ -58,15 +58,11 @@ describe("médias do ciclo", () => {
 
 describe("previsões", () => {
   it("prevê a próxima menstruação a partir do último início", () => {
-    const prediction = nextPeriodPrediction(cycles, {
-      cycleLength: null,
-      periodLength: null,
-    });
-    expect(prediction?.startDate).toBe("2024-03-25");
+    expect(predictNextPeriod(cycles, null)?.date).toBe("2024-03-25");
   });
 
   it("marca os dias estimados de menstruação", () => {
-    const days = predictedPeriodDays(cycles, { cycleLength: null, periodLength: null });
+    const days = predictedPeriodDays(cycles, { cycleLength: null, periodLength: null }, 1);
     expect(days[0]).toBe("2024-03-25");
     expect(days).toHaveLength(5);
   });
@@ -76,17 +72,21 @@ describe("previsões", () => {
   });
 
   it("não devolve previsão sem nenhum ciclo", () => {
-    expect(nextPeriodPrediction([], { cycleLength: null, periodLength: null })).toBeNull();
+    expect(predictNextPeriod([], null)).toBeNull();
   });
 });
 
 describe("fases", () => {
   it("classifica o primeiro dia como menstrual", () => {
-    expect(phaseForCycleDay(1, 28, 5)).toBe("menstrual");
+    expect(estimatePhase(1, 28, 5)).toBe("menstrual");
   });
 
   it("classifica a fase lútea depois da ovulação", () => {
-    expect(phaseForCycleDay(24, 28, 5)).toBe("luteal");
+    expect(estimatePhase(24, 28, 5)).toBe("luteal");
+  });
+
+  it("classifica a janela ovulatória estimada", () => {
+    expect(estimatePhase(14, 28, 5)).toBe("ovulatory");
   });
 });
 
@@ -104,6 +104,15 @@ describe("validação de registros", () => {
     const issues = validateCycleEntry(
       { start_date: "2024-03-05", end_date: "2024-03-01" },
       [],
+      "2024-03-10",
+    );
+    expect(issues.some((issue) => issue.level === "error")).toBe(true);
+  });
+
+  it("rejeita duas menstruações no mesmo dia", () => {
+    const issues = validateCycleEntry(
+      { start_date: "2024-02-26", end_date: null },
+      cycles,
       "2024-03-10",
     );
     expect(issues.some((issue) => issue.level === "error")).toBe(true);

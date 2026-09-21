@@ -217,7 +217,11 @@ function SettingsScreen() {
           <Label htmlFor="temperature-unit">Unidade de temperatura</Label>
           <Select
             value={preferences.data?.temperature_unit ?? "celsius"}
-            onValueChange={(value) => updatePreferences.mutate({ temperature_unit: value })}
+            onValueChange={(value) =>
+              updatePreferences.mutate({
+                temperature_unit: value === "fahrenheit" ? "fahrenheit" : "celsius",
+              })
+            }
           >
             <SelectTrigger id="temperature-unit" className="min-h-12">
               <SelectValue />
