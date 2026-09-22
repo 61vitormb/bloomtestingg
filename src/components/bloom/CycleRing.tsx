@@ -20,7 +20,7 @@ export function CycleRing({
   label,
   helper,
 }: CycleRingProps) {
-  const size = 260;
+  const size = 220;
   const radius = 112;
   const circumference = 2 * Math.PI * radius;
   const ratio =
@@ -29,7 +29,7 @@ export function CycleRing({
 
   return (
     <div
-      className="relative mx-auto flex aspect-square w-full max-w-[280px] items-center justify-center"
+      className="relative mx-auto flex aspect-square w-full max-w-[210px] items-center justify-center"
       role="img"
       aria-label={
         dayOfCycle === null
@@ -37,10 +37,6 @@ export function CycleRing({
           : `Dia ${dayOfCycle} do ciclo, fase estimada ${info?.label ?? "indefinida"}. ${label}`
       }
     >
-      <div
-        className="absolute inset-8 rounded-full blur-2xl transition-all duration-700"
-        style={{ background: info?.gradientVar ?? "var(--gradient-follicular)", opacity: 0.85 }}
-      />
       <svg viewBox={`0 0 ${size} ${size}`} className="absolute inset-0 h-full w-full -rotate-90">
         <circle
           cx={size / 2}
@@ -48,17 +44,15 @@ export function CycleRing({
           r={radius}
           fill="none"
           stroke="var(--border)"
-          strokeWidth="6"
-          strokeDasharray="2 8"
-          strokeLinecap="round"
+          strokeWidth="8"
         />
         <circle
           cx={size / 2}
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke={info?.accent ?? "var(--bloom-green)"}
-          strokeWidth="7"
+          stroke="var(--foreground)"
+          strokeWidth="9"
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={circumference * (1 - ratio)}
@@ -66,11 +60,11 @@ export function CycleRing({
         />
       </svg>
       <div className="relative z-10 px-8 text-center">
-        <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+        <p className="text-xs font-semibold text-muted-foreground uppercase">
           {dayOfCycle === null ? "Sem registros" : `Dia ${dayOfCycle} do ciclo`}
         </p>
-        <p className="mt-2 text-3xl leading-tight font-bold text-foreground">{label}</p>
-        {helper ? <p className="mt-2 text-sm text-muted-foreground">{helper}</p> : null}
+        <p className="mt-1 text-2xl leading-tight font-bold text-foreground">{label}</p>
+        {helper ? <p className="mt-1 text-xs text-muted-foreground">{helper}</p> : null}
       </div>
     </div>
   );

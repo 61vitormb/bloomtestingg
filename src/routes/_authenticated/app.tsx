@@ -7,10 +7,10 @@ export const Route = createFileRoute("/_authenticated/app")({
 
 function AppLayout() {
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-md px-5 pt-8 pb-28">
+    <div className="min-h-dvh bg-background">
+      <main className="mx-auto h-dvh max-w-md overflow-y-auto px-4 pt-[max(16px,env(safe-area-inset-top))] pb-24">
         <Outlet />
-      </div>
+      </main>
       <BottomNav />
     </div>
   );
