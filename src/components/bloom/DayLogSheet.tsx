@@ -159,10 +159,10 @@ export function DayLogSheet({ date, open, onOpenChange }: DayLogSheetProps) {
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
-        className="max-h-[92vh] overflow-y-auto rounded-t-3xl border-border px-5 pb-10"
+        className="max-h-[94dvh] overflow-y-auto rounded-t-3xl border-border px-5 pb-8"
       >
         <SheetHeader className="px-0 text-left">
-          <SheetTitle className="text-xl font-semibold">Registro do dia</SheetTitle>
+          <SheetTitle className="text-2xl font-bold text-neon">Novo registro</SheetTitle>
           <SheetDescription className="capitalize">{formatWeekdayLong(date)}</SheetDescription>
         </SheetHeader>
 
@@ -180,7 +180,7 @@ export function DayLogSheet({ date, open, onOpenChange }: DayLogSheetProps) {
           </div>
         ) : null}
 
-        <section className="space-y-3">
+        <section className="space-y-3 rounded-2xl bg-secondary p-4">
           <h3 className="text-sm font-semibold">Menstruação</h3>
           <div className="flex flex-wrap gap-2">
             {cycleStartingHere ? (
@@ -232,7 +232,7 @@ export function DayLogSheet({ date, open, onOpenChange }: DayLogSheetProps) {
           </fieldset>
         </section>
 
-        <section className="mt-6 space-y-2">
+        <section className="mt-4 space-y-2">
           <h3 className="text-sm font-semibold">Sintomas físicos</h3>
           <div className="flex flex-wrap gap-2">
             {SYMPTOM_OPTIONS.map((option) => {
@@ -258,9 +258,9 @@ export function DayLogSheet({ date, open, onOpenChange }: DayLogSheetProps) {
           </div>
         </section>
 
-        <section className="mt-6 space-y-2">
+        <section className="mt-4 space-y-2">
           <h3 className="text-sm font-semibold">Como você está se sentindo?</h3>
-          <div className="grid grid-cols-3 gap-2">
+           <div className="flex flex-wrap gap-2">
             {MOOD_OPTIONS.map((option) => {
               const active = moods.includes(option.value);
               return (
@@ -270,14 +270,13 @@ export function DayLogSheet({ date, open, onOpenChange }: DayLogSheetProps) {
                   aria-pressed={active}
                   onClick={() => setMoods((prev) => toggle(prev, option.value))}
                   className={cn(
-                    "flex min-h-24 flex-col items-center justify-center gap-1 rounded-2xl border p-2 transition-all",
+                    "min-h-11 rounded-full border px-4 text-sm transition-colors",
                     active
                       ? "border-primary bg-secondary/70 shadow-[var(--shadow-petal)]"
                       : "border-border bg-card hover:bg-secondary/40",
                   )}
                 >
-                  <MoodShape mood={option.value} size={40} />
-                  <span className="text-xs font-medium">{option.label}</span>
+                  <span className="font-medium">{active ? "✓ " : ""}{option.label}</span>
                 </button>
               );
             })}
@@ -314,7 +313,7 @@ export function DayLogSheet({ date, open, onOpenChange }: DayLogSheetProps) {
           />
         </section>
 
-        <section className="mt-6 space-y-2">
+        <section className="mt-4 space-y-2">
           <Label htmlFor="day-notes" className="text-sm font-semibold">
             Observações do dia (opcional)
           </Label>
@@ -327,8 +326,8 @@ export function DayLogSheet({ date, open, onOpenChange }: DayLogSheetProps) {
           />
         </section>
 
-        <div className="mt-6 flex flex-col gap-2">
-          <Button onClick={handleSave} disabled={saving} className="min-h-12">
+        <div className="mt-5 flex flex-col gap-2">
+          <Button onClick={handleSave} disabled={saving} className="min-h-12 rounded-full">
             {saving ? "Salvando na nuvem…" : "Salvar registro"}
           </Button>
           <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={saving}>
