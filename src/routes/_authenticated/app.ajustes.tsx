@@ -52,8 +52,14 @@ function SettingsScreen() {
   async function saveCycle() {
     const cycle = cycleLength ? Number(cycleLength) : null;
     const period = periodLength ? Number(periodLength) : null;
-    if (cycle !== null && (!Number.isInteger(cycle) || cycle < 15 || cycle > 90)) return toast.error("A duração do ciclo deve ficar entre 15 e 90 dias.");
-    if (period !== null && (!Number.isInteger(period) || period < 1 || period > 15)) return toast.error("A duração do sangramento deve ficar entre 1 e 15 dias.");
+    if (cycle !== null && (!Number.isInteger(cycle) || cycle < 15 || cycle > 90)) {
+      toast.error("A duração do ciclo deve ficar entre 15 e 90 dias.");
+      return;
+    }
+    if (period !== null && (!Number.isInteger(period) || period < 1 || period > 15)) {
+      toast.error("A duração do sangramento deve ficar entre 1 e 15 dias.");
+      return;
+    }
     await updatePreferences.mutateAsync({ average_cycle_length: cycle, average_period_length: period });
   }
 

@@ -120,6 +120,7 @@ export function DayLogSheet({ date, open, onOpenChange }: DayLogSheetProps) {
   }
 
   async function handleMarkStart() {
+    if (!date) return;
     const issues = validateCycleEntry({ start_date: date }, cycleRecords, todayISO());
     const errors = issues.filter((i) => i.level === "error");
     setWarnings(issues.filter((i) => i.level === "warning").map((i) => i.message));
@@ -131,7 +132,7 @@ export function DayLogSheet({ date, open, onOpenChange }: DayLogSheetProps) {
   }
 
   async function handleMarkEnd() {
-    if (!openCycle) return;
+    if (!openCycle || !date) return;
     const issues = validateCycleEntry(
       { start_date: openCycle.start_date, end_date: date },
       cycleRecords,
