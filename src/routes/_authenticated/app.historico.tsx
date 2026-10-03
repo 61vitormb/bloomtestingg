@@ -24,6 +24,8 @@ export const Route = createFileRoute("/_authenticated/app/historico")({
       { name: "description", content: "Consulte, edite e exclua os ciclos que você registrou." },
       { property: "og:title", content: "Histórico de ciclos — Bloom" },
       { property: "og:description", content: "Duração dos ciclos e do sangramento." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),

@@ -80,14 +80,15 @@ function CalendarScreen() {
 
   return (
     <div className="space-y-5">
-      <header className="flex items-center justify-between">
+      <header className="grid grid-cols-[auto_1fr_auto] items-center gap-2">
         <Button variant="ghost" size="icon" className="size-11 rounded-full" onClick={() => shiftMonth(-1)} aria-label="Mês anterior">
           <ChevronLeft aria-hidden="true" />
         </Button>
-        <h1 className="text-3xl font-bold capitalize text-neon">{formatMonthYear(year, month)}</h1>
-        <Button variant="default" size="icon" className="size-11 rounded-full" onClick={() => setSheetOpen(true)} aria-label={`Adicionar registro em ${formatShort(selected)}`}>
-          <Plus aria-hidden="true" />
-        </Button>
+        <h1 className="text-center text-3xl font-bold capitalize text-neon">{formatMonthYear(year, month)}</h1>
+        <div className="flex gap-1">
+          <Button variant="ghost" size="icon" className="size-11 rounded-full" onClick={() => shiftMonth(1)} aria-label="Próximo mês"><ChevronRight aria-hidden="true" /></Button>
+          <Button variant="default" size="icon" className="size-11 rounded-full" onClick={() => setSheetOpen(true)} aria-label={`Adicionar registro em ${formatShort(selected)}`}><Plus aria-hidden="true" /></Button>
+        </div>
       </header>
 
       <section aria-label="Semana selecionada">
@@ -173,7 +174,6 @@ function CalendarScreen() {
       </details>
 
       <DayLogSheet date={selected} open={sheetOpen} onOpenChange={setSheetOpen} />
-      <Button variant="ghost" size="icon" className="sr-only" onClick={() => shiftMonth(1)} aria-label="Próximo mês"><ChevronRight /></Button>
     </div>
   );
 }
