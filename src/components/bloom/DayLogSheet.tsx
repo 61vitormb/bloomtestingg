@@ -11,7 +11,6 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { MoodShape } from "@/components/bloom/MoodShape";
 import { FLOW_OPTIONS, INTENSITY_LABELS, MOOD_OPTIONS, SYMPTOM_OPTIONS } from "@/domain/catalog";
 import { validateCycleEntry, type CycleRecord, type FlowIntensity } from "@/domain/cycle";
 import { formatWeekdayLong, todayISO } from "@/lib/format";
@@ -121,20 +120,20 @@ export function DayLogSheet({ date, open, onOpenChange }: DayLogSheetProps) {
   }
 
   async function handleMarkStart() {
-    const issues = validateCycleEntry({ start_date: date! }, cycleRecords, todayISO());
+    const issues = validateCycleEntry({ start_date: date }, cycleRecords, todayISO());
     const errors = issues.filter((i) => i.level === "error");
     setWarnings(issues.filter((i) => i.level === "warning").map((i) => i.message));
     if (errors.length > 0) {
       setWarnings(errors.map((i) => i.message));
       return;
     }
-    await createCycle.mutateAsync({ start_date: date!, end_date: null, notes: null });
+    await createCycle.mutateAsync({ start_date: date, end_date: null, notes: null });
   }
 
   async function handleMarkEnd() {
     if (!openCycle) return;
     const issues = validateCycleEntry(
-      { start_date: openCycle.start_date, end_date: date! },
+      { start_date: openCycle.start_date, end_date: date },
       cycleRecords,
       todayISO(),
       openCycle.id,
@@ -145,7 +144,7 @@ export function DayLogSheet({ date, open, onOpenChange }: DayLogSheetProps) {
       setWarnings(errors.map((i) => i.message));
       return;
     }
-    await updateCycle.mutateAsync({ id: openCycle.id, end_date: date! });
+    await updateCycle.mutateAsync({ id: openCycle.id, end_date: date });
   }
 
   const saving =
