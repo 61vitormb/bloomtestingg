@@ -34,15 +34,15 @@ export function flowLabel(value: string | null | undefined): string | null {
 
 /** Cada humor tem uma forma orgânica e um par de cores próprios — nada de emojis. */
 export const MOOD_OPTIONS = [
-  { value: "happy", label: "Feliz", from: "#F5D77B", to: "#E98AB8", shape: "petal" },
-  { value: "calm", label: "Tranquila", from: "#DDF4E8", to: "#35C98A", shape: "wave" },
-  { value: "energized", label: "Energizada", from: "#35C98A", to: "#F5D77B", shape: "burst" },
-  { value: "neutral", label: "Neutra", from: "#E8E7E1", to: "#B9A5E8", shape: "circle" },
-  { value: "anxious", label: "Ansiosa", from: "#B9A5E8", to: "#35C98A", shape: "ripple" },
-  { value: "sad", label: "Triste", from: "#B9A5E8", to: "#174B3C", shape: "drop" },
-  { value: "irritated", label: "Irritada", from: "#E98AB8", to: "#F5D77B", shape: "burst" },
-  { value: "sensitive", label: "Sensível", from: "#F8E3ED", to: "#E98AB8", shape: "petal" },
-  { value: "tired", label: "Cansada", from: "#E8E7E1", to: "#777A76", shape: "wave" },
+  { value: "happy", label: "Feliz", from: "var(--foreground)", to: "var(--muted-foreground)", shape: "petal" },
+  { value: "calm", label: "Tranquila", from: "var(--foreground)", to: "var(--muted)", shape: "wave" },
+  { value: "energized", label: "Energizada", from: "var(--foreground)", to: "var(--border)", shape: "burst" },
+  { value: "neutral", label: "Neutra", from: "var(--muted-foreground)", to: "var(--muted)", shape: "circle" },
+  { value: "anxious", label: "Ansiosa", from: "var(--foreground)", to: "var(--muted-foreground)", shape: "ripple" },
+  { value: "sad", label: "Triste", from: "var(--muted-foreground)", to: "var(--foreground)", shape: "drop" },
+  { value: "irritated", label: "Irritada", from: "var(--foreground)", to: "var(--border)", shape: "burst" },
+  { value: "sensitive", label: "Sensível", from: "var(--muted)", to: "var(--foreground)", shape: "petal" },
+  { value: "tired", label: "Cansada", from: "var(--border)", to: "var(--muted-foreground)", shape: "wave" },
 ] as const;
 
 export type MoodValue = (typeof MOOD_OPTIONS)[number]["value"];

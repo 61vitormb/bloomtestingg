@@ -1,29 +1,17 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { Download, LogOut, ShieldCheck, Trash2 } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
+import { CalendarRange, ChevronRight, Download, LogOut, ShieldCheck, Trash2, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { exportAllData } from "@/services/bloom";
 import { useAuth } from "@/hooks/useAuth";
-import {
-  useDeleteAllRecords,
-  usePreferences,
-  useProfile,
-  useUpdatePreferences,
-  useUpdateProfile,
-} from "@/hooks/useBloomData";
+import { useDeleteAllRecords, usePreferences, useProfile, useUpdatePreferences, useUpdateProfile } from "@/hooks/useBloomData";
 
 export const Route = createFileRoute("/_authenticated/app/ajustes")({
   head: () => ({
@@ -32,6 +20,8 @@ export const Route = createFileRoute("/_authenticated/app/ajustes")({
       { name: "description", content: "Perfil, preferências, privacidade e seus dados." },
       { property: "og:title", content: "Ajustes — Bloom" },
       { property: "og:description", content: "Controle total sobre seus dados no Bloom." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -47,27 +37,19 @@ function SettingsScreen() {
   const updateProfile = useUpdateProfile();
   const updatePreferences = useUpdatePreferences();
   const deleteAll = useDeleteAllRecords();
-
   const [displayName, setDisplayName] = useState("");
   const [cycleLength, setCycleLength] = useState("");
   const [periodLength, setPeriodLength] = useState("");
   const [exporting, setExporting] = useState(false);
 
-  useEffect(() => {
-    if (profile.data) setDisplayName(profile.data.display_name ?? "");
-  }, [profile.data]);
-
+  useEffect(() => { if (profile.data) setDisplayName(profile.data.display_name ?? ""); }, [profile.data]);
   useEffect(() => {
     if (!preferences.data) return;
     setCycleLength(preferences.data.average_cycle_length?.toString() ?? "");
     setPeriodLength(preferences.data.average_period_length?.toString() ?? "");
   }, [preferences.data]);
 
-  async function handleSaveProfile() {
-    await updateProfile.mutateAsync({ display_name: displayName.trim() || null });
-  }
-
-  async function handleSaveCycleDefaults() {
+  async function saveCycle() {
     const cycle = cycleLength ? Number(cycleLength) : null;
     const period = periodLength ? Number(periodLength) : null;
     if (cycle !== null && (!Number.isInteger(cycle) || cycle < 15 || cycle > 90)) {
@@ -78,18 +60,14 @@ function SettingsScreen() {
       toast.error("A duração do sangramento deve ficar entre 1 e 15 dias.");
       return;
     }
-    await updatePreferences.mutateAsync({
-      average_cycle_length: cycle,
-      average_period_length: period,
-    });
+    await updatePreferences.mutateAsync({ average_cycle_length: cycle, average_period_length: period });
   }
 
   async function handleExport() {
     setExporting(true);
     try {
       const payload = await exportAllData();
-      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
+      const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" }));
       const link = document.createElement("a");
       link.href = url;
       link.download = `bloom-meus-dados-${new Date().toISOString().slice(0, 10)}.json`;
@@ -97,25 +75,11 @@ function SettingsScreen() {
       URL.revokeObjectURL(url);
       toast.success("Arquivo com seus dados gerado.");
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Não foi possível exportar seus dados agora.",
-      );
-    } finally {
-      setExporting(false);
-    }
+      toast.error(error instanceof Error ? error.message : "Não foi possível exportar seus dados agora.");
+    } finally { setExporting(false); }
   }
 
-  async function handleDeleteAll() {
-    if (
-      !window.confirm(
-        "Excluir TODOS os seus registros de ciclos, sintomas e humor? Essa ação não pode ser desfeita.",
-      )
-    )
-      return;
-    await deleteAll.mutateAsync(undefined);
-  }
-
-  async function handleSignOut() {
+  async function signOut() {
     await queryClient.cancelQueries();
     queryClient.clear();
     await supabase.auth.signOut();
@@ -123,154 +87,60 @@ function SettingsScreen() {
   }
 
   return (
-    <div className="space-y-6">
-      <header>
-        <h1 className="text-2xl font-bold">Ajustes</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Seu perfil, suas preferências e o controle dos seus dados.
-        </p>
+    <div className="space-y-5 pb-2">
+      <header className="text-center">
+        <div className="mx-auto flex size-20 items-center justify-center rounded-full bg-foreground text-2xl font-bold text-primary-foreground" aria-hidden="true">
+          {(displayName || user?.email || "B").slice(0, 1).toUpperCase()}
+        </div>
+        <h1 className="mt-3 text-2xl font-bold text-neon">{displayName || "Meus dados"}</h1>
+        <p className="text-sm text-muted-foreground">{user?.email}</p>
       </header>
 
-      <section className="bloom-card space-y-3 p-4">
-        <h2 className="text-base font-semibold">Perfil</h2>
-        <div className="space-y-2">
-          <Label htmlFor="display-name">Como quer ser chamada?</Label>
-          <Input
-            id="display-name"
-            className="min-h-12"
-            maxLength={80}
-            value={displayName}
-            onChange={(event) => setDisplayName(event.target.value)}
-            placeholder="Opcional"
-          />
-        </div>
-        <p className="text-xs text-muted-foreground">Conta: {user?.email}</p>
-        <Button
-          className="min-h-12 w-full"
-          onClick={handleSaveProfile}
-          disabled={updateProfile.isPending}
-        >
-          Salvar perfil
-        </Button>
-      </section>
-
-      <section className="bloom-card space-y-3 p-4">
-        <h2 className="text-base font-semibold">Ciclo</h2>
-        <p className="text-xs text-muted-foreground">
-          Usamos esses valores só enquanto você ainda não tem ciclos registrados suficientes.
-        </p>
-        <div className="space-y-2">
-          <Label htmlFor="cycle-length">Duração média do ciclo (dias)</Label>
-          <Input
-            id="cycle-length"
-            className="min-h-12"
-            type="number"
-            inputMode="numeric"
-            min={15}
-            max={90}
-            value={cycleLength}
-            onChange={(event) => setCycleLength(event.target.value)}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="period-length">Duração média do sangramento (dias)</Label>
-          <Input
-            id="period-length"
-            className="min-h-12"
-            type="number"
-            inputMode="numeric"
-            min={1}
-            max={15}
-            value={periodLength}
-            onChange={(event) => setPeriodLength(event.target.value)}
-          />
-        </div>
-        <Button
-          className="min-h-12 w-full"
-          onClick={handleSaveCycleDefaults}
-          disabled={updatePreferences.isPending}
-        >
-          Salvar valores do ciclo
-        </Button>
-      </section>
-
-      <section className="bloom-card space-y-4 p-4">
-        <h2 className="text-base font-semibold">Preferências</h2>
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <Label htmlFor="notifications" className="text-sm">
-              Lembretes de registro
-            </Label>
-            <p className="text-xs text-muted-foreground">
-              Guardamos sua escolha; nada é enviado sem sua permissão no dispositivo.
-            </p>
+      <SettingsGroup label="Usuário">
+        <details>
+          <summary className="settings-row"><UserRound aria-hidden="true" /><span>Editar dados pessoais</span><ChevronRight aria-hidden="true" /></summary>
+          <div className="space-y-3 border-t border-border p-4">
+            <Label htmlFor="display-name">Como quer ser chamada?</Label>
+            <Input id="display-name" className="min-h-12" maxLength={80} value={displayName} onChange={(event) => setDisplayName(event.target.value)} placeholder="Opcional" />
+            <Button className="min-h-11 w-full rounded-full" disabled={updateProfile.isPending} onClick={() => updateProfile.mutate({ display_name: displayName.trim() || null })}>Salvar nome</Button>
           </div>
-          <Switch
-            id="notifications"
-            checked={preferences.data?.notifications_enabled ?? false}
-            onCheckedChange={(checked) =>
-              updatePreferences.mutate({ notifications_enabled: checked })
-            }
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="temperature-unit">Unidade de temperatura</Label>
-          <Select
-            value={preferences.data?.temperature_unit ?? "celsius"}
-            onValueChange={(value) =>
-              updatePreferences.mutate({
-                temperature_unit: value === "fahrenheit" ? "fahrenheit" : "celsius",
-              })
-            }
-          >
-            <SelectTrigger id="temperature-unit" className="min-h-12">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="celsius">Celsius (°C)</SelectItem>
-              <SelectItem value="fahrenheit">Fahrenheit (°F)</SelectItem>
-            </SelectContent>
+        </details>
+      </SettingsGroup>
+
+      <SettingsGroup label="Ciclo">
+        <details>
+          <summary className="settings-row"><CalendarRange aria-hidden="true" /><span>Preferências do ciclo</span><ChevronRight aria-hidden="true" /></summary>
+          <div className="space-y-3 border-t border-border p-4">
+            <div><Label htmlFor="cycle-length">Duração média do ciclo</Label><Input id="cycle-length" className="mt-2 min-h-12" type="number" inputMode="numeric" min={15} max={90} value={cycleLength} onChange={(event) => setCycleLength(event.target.value)} /></div>
+            <div><Label htmlFor="period-length">Duração média do sangramento</Label><Input id="period-length" className="mt-2 min-h-12" type="number" inputMode="numeric" min={1} max={15} value={periodLength} onChange={(event) => setPeriodLength(event.target.value)} /></div>
+            <Button className="min-h-11 w-full rounded-full" disabled={updatePreferences.isPending} onClick={saveCycle}>Salvar ciclo</Button>
+          </div>
+        </details>
+        <Link to="/app/historico" className="settings-row border-t border-border"><CalendarRange aria-hidden="true" /><span>Histórico de ciclos</span><ChevronRight aria-hidden="true" /></Link>
+      </SettingsGroup>
+
+      <SettingsGroup label="Preferências">
+        <div className="settings-row"><span>Lembretes de registro</span><Switch aria-label="Lembretes de registro" checked={preferences.data?.notifications_enabled ?? false} onCheckedChange={(checked) => updatePreferences.mutate({ notifications_enabled: checked })} /></div>
+        <div className="flex min-h-14 items-center justify-between gap-4 border-t border-border px-4">
+          <Label htmlFor="temperature-unit">Temperatura</Label>
+          <Select value={preferences.data?.temperature_unit ?? "celsius"} onValueChange={(value) => updatePreferences.mutate({ temperature_unit: value === "fahrenheit" ? "fahrenheit" : "celsius" })}>
+            <SelectTrigger id="temperature-unit" className="w-32"><SelectValue /></SelectTrigger>
+            <SelectContent><SelectItem value="celsius">Celsius</SelectItem><SelectItem value="fahrenheit">Fahrenheit</SelectItem></SelectContent>
           </Select>
         </div>
-      </section>
+      </SettingsGroup>
 
-      <section className="bloom-card space-y-3 p-4">
-        <h2 className="flex items-center gap-2 text-base font-semibold">
-          <ShieldCheck className="h-4 w-4" aria-hidden="true" />
-          Privacidade e seus dados
-        </h2>
-        <p className="text-sm text-muted-foreground">
-          Seus registros ficam na sua conta e só você pode lê-los. Não vendemos nem compartilhamos
-          seus dados. O Bloom mostra estimativas com base no que você registra e não substitui
-          avaliação profissional de saúde.
-        </p>
-        <Button
-          variant="outline"
-          className="min-h-12 w-full"
-          onClick={handleExport}
-          disabled={exporting}
-        >
-          <Download className="h-4 w-4" aria-hidden="true" />
-          {exporting ? "Preparando arquivo…" : "Exportar meus dados (JSON)"}
-        </Button>
-        <Button
-          variant="outline"
-          className="min-h-12 w-full text-destructive hover:text-destructive"
-          onClick={handleDeleteAll}
-          disabled={deleteAll.isPending}
-        >
-          <Trash2 className="h-4 w-4" aria-hidden="true" />
-          Excluir todos os meus registros
-        </Button>
-      </section>
+      <SettingsGroup label="Privacidade">
+        <Button variant="ghost" className="settings-row h-auto w-full justify-start rounded-none" onClick={handleExport} disabled={exporting}><Download aria-hidden="true" /><span>{exporting ? "Preparando arquivo…" : "Exportar meus dados"}</span><ChevronRight className="ml-auto" aria-hidden="true" /></Button>
+        <Button variant="ghost" className="settings-row h-auto w-full justify-start rounded-none border-t border-border text-destructive hover:text-destructive" disabled={deleteAll.isPending} onClick={() => { if (window.confirm("Excluir TODOS os seus registros? Essa ação não pode ser desfeita.")) deleteAll.mutate(undefined); }}><Trash2 aria-hidden="true" /><span>Excluir meus registros</span><ChevronRight className="ml-auto" aria-hidden="true" /></Button>
+      </SettingsGroup>
 
-      <section className="bloom-card space-y-3 p-4">
-        <h2 className="text-base font-semibold">Conta</h2>
-        <Button variant="ghost" className="min-h-12 w-full" onClick={handleSignOut}>
-          <LogOut className="h-4 w-4" aria-hidden="true" />
-          Sair da conta
-        </Button>
-      </section>
+      <p className="flex items-start gap-2 text-xs leading-relaxed text-muted-foreground"><ShieldCheck className="mt-0.5 size-4 shrink-0" aria-hidden="true" />Seus registros são privados e as previsões são apenas estimativas.</p>
+      <Button variant="outline" className="min-h-12 w-full rounded-2xl text-destructive hover:text-destructive" onClick={signOut}><LogOut aria-hidden="true" />Sair da conta</Button>
     </div>
   );
+}
+
+function SettingsGroup({ label, children }: { label: string; children: ReactNode }) {
+  return <section><h2 className="mb-2 px-2 text-[11px] font-bold uppercase text-muted-foreground">{label}</h2><div className="overflow-hidden rounded-2xl border border-border">{children}</div></section>;
 }

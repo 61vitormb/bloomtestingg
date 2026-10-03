@@ -11,7 +11,6 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { MoodShape } from "@/components/bloom/MoodShape";
 import { FLOW_OPTIONS, INTENSITY_LABELS, MOOD_OPTIONS, SYMPTOM_OPTIONS } from "@/domain/catalog";
 import { validateCycleEntry, type CycleRecord, type FlowIntensity } from "@/domain/cycle";
 import { formatWeekdayLong, todayISO } from "@/lib/format";
@@ -121,20 +120,21 @@ export function DayLogSheet({ date, open, onOpenChange }: DayLogSheetProps) {
   }
 
   async function handleMarkStart() {
-    const issues = validateCycleEntry({ start_date: date! }, cycleRecords, todayISO());
+    if (!date) return;
+    const issues = validateCycleEntry({ start_date: date }, cycleRecords, todayISO());
     const errors = issues.filter((i) => i.level === "error");
     setWarnings(issues.filter((i) => i.level === "warning").map((i) => i.message));
     if (errors.length > 0) {
       setWarnings(errors.map((i) => i.message));
       return;
     }
-    await createCycle.mutateAsync({ start_date: date!, end_date: null, notes: null });
+    await createCycle.mutateAsync({ start_date: date, end_date: null, notes: null });
   }
 
   async function handleMarkEnd() {
-    if (!openCycle) return;
+    if (!openCycle || !date) return;
     const issues = validateCycleEntry(
-      { start_date: openCycle.start_date, end_date: date! },
+      { start_date: openCycle.start_date, end_date: date },
       cycleRecords,
       todayISO(),
       openCycle.id,
@@ -145,7 +145,7 @@ export function DayLogSheet({ date, open, onOpenChange }: DayLogSheetProps) {
       setWarnings(errors.map((i) => i.message));
       return;
     }
-    await updateCycle.mutateAsync({ id: openCycle.id, end_date: date! });
+    await updateCycle.mutateAsync({ id: openCycle.id, end_date: date });
   }
 
   const saving =
@@ -212,20 +212,21 @@ export function DayLogSheet({ date, open, onOpenChange }: DayLogSheetProps) {
               {FLOW_OPTIONS.map((option) => {
                 const active = flow === option.value;
                 return (
-                  <button
+                  <Button
                     key={option.value}
                     type="button"
                     aria-pressed={active}
                     onClick={() => setFlow(active ? null : option.value)}
+                    variant="outline"
                     className={cn(
-                      "min-h-11 rounded-full border px-4 text-sm transition-colors",
+                      "min-h-11 rounded-full px-4 text-sm shadow-none",
                       active
                         ? "border-primary bg-primary text-primary-foreground"
                         : "border-border bg-card text-foreground hover:bg-secondary",
                     )}
                   >
                     {option.label}
-                  </button>
+                  </Button>
                 );
               })}
             </div>
@@ -238,13 +239,14 @@ export function DayLogSheet({ date, open, onOpenChange }: DayLogSheetProps) {
             {SYMPTOM_OPTIONS.map((option) => {
               const active = symptoms.includes(option.value);
               return (
-                <button
+                <Button
                   key={option.value}
                   type="button"
                   aria-pressed={active}
                   onClick={() => setSymptoms((prev) => toggle(prev, option.value))}
+                  variant="outline"
                   className={cn(
-                    "min-h-11 rounded-full border px-4 text-sm transition-colors",
+                    "min-h-11 rounded-full px-4 text-sm shadow-none",
                     active
                       ? "border-primary bg-secondary font-medium text-secondary-foreground"
                       : "border-border bg-card text-foreground hover:bg-secondary",
@@ -252,7 +254,7 @@ export function DayLogSheet({ date, open, onOpenChange }: DayLogSheetProps) {
                 >
                   {active ? "✓ " : ""}
                   {option.label}
-                </button>
+                </Button>
               );
             })}
           </div>
@@ -264,20 +266,21 @@ export function DayLogSheet({ date, open, onOpenChange }: DayLogSheetProps) {
             {MOOD_OPTIONS.map((option) => {
               const active = moods.includes(option.value);
               return (
-                <button
+                <Button
                   key={option.value}
                   type="button"
                   aria-pressed={active}
                   onClick={() => setMoods((prev) => toggle(prev, option.value))}
+                  variant="outline"
                   className={cn(
-                    "min-h-11 rounded-full border px-4 text-sm transition-colors",
+                    "min-h-11 rounded-full px-4 text-sm shadow-none",
                     active
                       ? "border-primary bg-secondary/70 shadow-[var(--shadow-petal)]"
                       : "border-border bg-card hover:bg-secondary/40",
                   )}
                 >
                   <span className="font-medium">{active ? "✓ " : ""}{option.label}</span>
-                </button>
+                </Button>
               );
             })}
           </div>
