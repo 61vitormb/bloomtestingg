@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, type ReactNode } from "react";
-import { CalendarRange, ChevronRight, Download, LogOut, ShieldCheck, Trash2, UserRound } from "lucide-react";
+import { CalendarRange, ChevronRight, Download, LogOut, ShieldCheck, Trash2, UserRound, X, Pencil, Sparkles, Palette, Info, HelpCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -88,16 +88,26 @@ function SettingsScreen() {
 
   return (
     <div className="space-y-5 pb-2">
-      <header className="text-center">
-        <div className="mx-auto flex size-20 items-center justify-center rounded-full bg-foreground text-2xl font-bold text-primary-foreground" aria-hidden="true">
-          {(displayName || user?.email || "B").slice(0, 1).toUpperCase()}
+      <header>
+        <div className="flex items-center justify-between">
+          <span className="size-11" aria-hidden="true" />
+          <h1 className="text-xl font-bold text-neon">Meus Dados</h1>
+          <Link to="/app" aria-label="Fechar" className="press flex size-11 items-center justify-center rounded-full bg-secondary"><X className="size-5" aria-hidden="true" /></Link>
         </div>
-        <h1 className="mt-3 text-2xl font-bold text-neon">{displayName || "Meus dados"}</h1>
-        <p className="text-sm text-muted-foreground">{user?.email}</p>
+        <div className="mt-4 text-center">
+          <div className="relative mx-auto size-24">
+            <div className="flex size-24 items-center justify-center rounded-full bg-foreground text-3xl font-bold text-primary-foreground" aria-hidden="true">
+              {(displayName || user?.email || "B").slice(0, 1).toUpperCase()}
+            </div>
+            <button type="button" aria-label="Editar nome" onClick={() => { const d = document.getElementById("edit-user") as HTMLDetailsElement | null; if (d) { d.open = true; document.getElementById("display-name")?.focus(); } }} className="press absolute -right-1 bottom-0 flex size-11 items-center justify-center rounded-full border-4 border-background bg-neon text-primary-foreground"><Pencil className="size-4" aria-hidden="true" /></button>
+          </div>
+          <p className="mt-3 text-lg font-bold">{displayName || "Sem nome"}</p>
+          <p className="text-sm text-muted-foreground">{user?.email}</p>
+        </div>
       </header>
 
       <SettingsGroup label="Usuário">
-        <details>
+        <details id="edit-user">
           <summary className="settings-row"><UserRound aria-hidden="true" /><span>Editar dados pessoais</span><ChevronRight aria-hidden="true" /></summary>
           <div className="space-y-3 border-t border-border p-4">
             <Label htmlFor="display-name">Como quer ser chamada?</Label>
@@ -130,13 +140,35 @@ function SettingsScreen() {
         </div>
       </SettingsGroup>
 
+      <SettingsGroup label="Assinatura">
+        <div className="settings-row"><Sparkles aria-hidden="true" /><span>Planos & Assinatura</span><span className="flex-none! text-xs text-muted-foreground">Gratuito</span></div>
+      </SettingsGroup>
+
+      <SettingsGroup label="Personalização">
+        <div className="settings-row"><Palette aria-hidden="true" /><span>Tema</span><span className="flex-none! text-xs text-muted-foreground">Monocromático</span></div>
+      </SettingsGroup>
+
+      <SettingsGroup label="Ajuda">
+        <details>
+          <summary className="settings-row"><Info aria-hidden="true" /><span>Sobre o Bloom</span><ChevronRight aria-hidden="true" /></summary>
+          <p className="border-t border-border p-4 text-sm text-muted-foreground">O Bloom organiza seus registros de ciclo, sintomas e humor. Seus dados ficam privados na sua conta.</p>
+        </details>
+        <details className="border-t border-border">
+          <summary className="settings-row"><HelpCircle aria-hidden="true" /><span>Perguntas frequentes</span><ChevronRight aria-hidden="true" /></summary>
+          <div className="space-y-2 border-t border-border p-4 text-sm text-muted-foreground">
+            <p><strong className="text-foreground">As previsões são exatas?</strong> Não. São estimativas baseadas nos seus registros.</p>
+            <p><strong className="text-foreground">Posso usar como contraceptivo?</strong> Não. O Bloom não é um método contraceptivo.</p>
+          </div>
+        </details>
+      </SettingsGroup>
+
       <SettingsGroup label="Privacidade">
         <Button variant="ghost" className="settings-row h-auto w-full justify-start rounded-none" onClick={handleExport} disabled={exporting}><Download aria-hidden="true" /><span>{exporting ? "Preparando arquivo…" : "Exportar meus dados"}</span><ChevronRight className="ml-auto" aria-hidden="true" /></Button>
         <Button variant="ghost" className="settings-row h-auto w-full justify-start rounded-none border-t border-border text-destructive hover:text-destructive" disabled={deleteAll.isPending} onClick={() => { if (window.confirm("Excluir TODOS os seus registros? Essa ação não pode ser desfeita.")) deleteAll.mutate(undefined); }}><Trash2 aria-hidden="true" /><span>Excluir meus registros</span><ChevronRight className="ml-auto" aria-hidden="true" /></Button>
       </SettingsGroup>
 
       <p className="flex items-start gap-2 text-xs leading-relaxed text-muted-foreground"><ShieldCheck className="mt-0.5 size-4 shrink-0" aria-hidden="true" />Seus registros são privados e as previsões são apenas estimativas.</p>
-      <Button variant="outline" className="min-h-12 w-full rounded-2xl text-destructive hover:text-destructive" onClick={signOut}><LogOut aria-hidden="true" />Sair da conta</Button>
+      <Button variant="outline" className="min-h-12 w-full rounded-full border-destructive/40 text-destructive hover:text-destructive" onClick={signOut}><LogOut aria-hidden="true" />Sair</Button>
     </div>
   );
 }

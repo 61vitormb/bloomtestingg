@@ -75,7 +75,7 @@
   --bloom-pink-soft: oklch(0.96 0.025 350);
   --bloom-lilac: oklch(0.42 0 0);
   --bloom-yellow: oklch(0.7 0 0);
-  --neon: oklch(0.66 0.3 350);
+  --neon: #ff2e93;
 
   --background: oklch(1 0 0);
   --foreground: oklch(0.12 0 0);
@@ -83,20 +83,20 @@
   --card-foreground: oklch(0.12 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.12 0 0);
-  --primary: oklch(0.12 0 0);
+  --primary: #0a0a0a;
   --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.96 0 0);
+  --secondary: #f5f5f5;
   --secondary-foreground: oklch(0.12 0 0);
-  --muted: oklch(0.96 0 0);
+  --muted: #f5f5f5;
   --muted-foreground: oklch(0.46 0 0);
   --accent: oklch(0.94 0 0);
   --accent-foreground: oklch(0.12 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.99 0.003 91);
-  --border: oklch(0.88 0 0);
-  --input: oklch(0.88 0 0);
+  --border: #e8e8e8;
+  --input: #e8e8e8;
   --ring: oklch(0.12 0 0);
-  --nav: oklch(0.08 0 0);
+  --nav: #0a0a0a;
   --nav-foreground: oklch(0.72 0 0);
 
   --chart-1: oklch(0.12 0 0);
@@ -206,6 +206,13 @@
     width: 1rem;
     height: 1rem;
     color: var(--muted-foreground);
+  }
+}
+
+@utility press {
+  transition: transform 150ms ease;
+  &:active {
+    transform: scale(0.97);
   }
 }
 

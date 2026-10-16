@@ -18,10 +18,11 @@ interface MoodShapeProps {
   mood: string;
   size?: number;
   className?: string;
+  mono?: boolean;
 }
 
 /** Ilustração orgânica reutilizável para cada estado emocional. */
-export function MoodShape({ mood, size = 56, className }: MoodShapeProps) {
+export function MoodShape({ mood, size = 56, className, mono }: MoodShapeProps) {
   const option = moodOption(mood);
   const gradientId = useId();
   if (!option) return null;
@@ -40,7 +41,7 @@ export function MoodShape({ mood, size = 56, className }: MoodShapeProps) {
           <stop offset="100%" stopColor={option.to} />
         </radialGradient>
       </defs>
-      <path d={PATHS[option.shape]} fill={`url(#${gradientId})`} />
+      <path d={PATHS[option.shape]} fill={mono ? "currentColor" : `url(#${gradientId})`} />
     </svg>
   );
 }

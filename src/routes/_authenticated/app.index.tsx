@@ -1,10 +1,16 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { CalendarDays, Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 import { DayLogSheet } from "@/components/bloom/DayLogSheet";
-import { PHASE_INFO } from "@/domain/catalog";
-import { addDays, buildCycleOverview, diffInDays, type CycleRecord } from "@/domain/cycle";
+import { PHASE_INFO, moodLabel } from "@/domain/catalog";
+import {
+  addDays,
+  buildCycleOverview,
+  diffInDays,
+  estimatedFertileWindow,
+  parseISODate,
+  type CycleRecord,
+} from "@/domain/cycle";
 import { formatShort, todayISO } from "@/lib/format";
 import { useCycles, useDailyLogs, useMoodLogs, usePreferences } from "@/hooks/useBloomData";
 import { cn } from "@/lib/utils";
@@ -24,6 +30,8 @@ export const Route = createFileRoute("/_authenticated/app/")({
   component: HomeScreen,
 });
 
+const WEEK_LETTERS = ["D", "S", "T", "Q", "Q", "S", "S"];
+
 function HomeScreen() {
   const navigate = useNavigate();
   const today = todayISO();
@@ -41,96 +49,148 @@ function HomeScreen() {
     () => (cycles.data ?? []).map(({ id, start_date, end_date }) => ({ id, start_date, end_date })),
     [cycles.data],
   );
+  const declared = {
+    cycleLength: preferences.data?.average_cycle_length ?? null,
+    periodLength: preferences.data?.average_period_length ?? null,
+  };
   const overview = useMemo(
-    () => buildCycleOverview(cycleRecords, today, {
-      cycleLength: preferences.data?.average_cycle_length ?? null,
-      periodLength: preferences.data?.average_period_length ?? null,
-    }),
+    () => buildCycleOverview(cycleRecords, today, declared),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [cycleRecords, today, preferences.data],
   );
-  const weekDays = useMemo(() => Array.from({ length: 7 }, (_, index) => addDays(today, index - 3)), [today]);
+  const fertile = useMemo(
+    () => estimatedFertileWindow(cycleRecords, declared.cycleLength),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [cycleRecords, preferences.data],
+  );
+
+  const weekStart = addDays(today, -parseISODate(today).getDay());
+  const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
   const phase = overview.phase ? PHASE_INFO[overview.phase] : null;
-  const todayLog = dailyLogs.data?.find((log) => log.log_date === today);
   const todayMood = moodLogs.data?.find((log) => log.log_date === today);
-  const hasTodayData = Boolean(todayLog || todayMood);
+  const hasTodayData = Boolean(dailyLogs.data?.some((l) => l.log_date === today) || todayMood);
+
+  const inPeriod = overview.phase === "menstrual";
+  const daysUntil = overview.daysUntilNextPeriod;
+  const ringRatio =
+    overview.dayOfCycle === null
+      ? 0
+      : Math.min(1, Math.max(0.03, overview.dayOfCycle / Math.max(overview.cycleLength.value, 1)));
+
+  let bigNumber = "—";
+  let ringLabel = "Registre sua menstruação";
+  if (inPeriod && overview.dayOfCycle !== null) {
+    bigNumber = String(overview.dayOfCycle);
+    ringLabel = "Menstruação · dia";
+  } else if (daysUntil !== null && daysUntil >= 0) {
+    bigNumber = String(daysUntil);
+    ringLabel = daysUntil === 1 ? "dia para a próxima menstruação" : "dias para a próxima menstruação";
+  } else if (overview.dayOfCycle !== null) {
+    bigNumber = String(overview.dayOfCycle);
+    ringLabel = "Dia do ciclo";
+  }
+
+  const fertileLabel = !fertile
+    ? "—"
+    : diffInDays(today, fertile.end) < 0
+      ? "Passou"
+      : formatShort(fertile.start);
+
+  const size = 200;
+  const r = 92;
+  const c = 2 * Math.PI * r;
 
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden">
-      <header className="flex items-center justify-between py-1">
-        <div>
-          <p className="text-xs font-semibold uppercase text-muted-foreground">Seu ciclo</p>
-          <h1 className="text-3xl font-bold text-neon">Bloom</h1>
-        </div>
-        <div className="text-right">
-          <p className="text-xs text-muted-foreground">Hoje</p>
-          <p className="font-semibold capitalize">{formatShort(today)}</p>
-        </div>
-      </header>
+      <h1 className="sr-only">Home</h1>
 
-      <section aria-label="Resumo do ciclo" className="mt-3 grid grid-cols-[1fr_auto] items-center gap-4 border-y border-border py-4">
-        <div>
-          <p className="text-sm text-muted-foreground">Fase estimada</p>
-          <h2 className="mt-1 text-2xl font-bold">{phase?.label ?? "Comece seu ciclo"}</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {overview.nextPeriod
-              ? `Próxima menstruação em ${diffInDays(today, overview.nextPeriod.date)} dias`
-              : "Adicione sua última menstruação"}
-          </p>
-        </div>
-        <div className="flex size-24 shrink-0 flex-col items-center justify-center rounded-full border-[7px] border-foreground text-center">
-          <span className="text-2xl font-bold">{overview.dayOfCycle ?? "—"}</span>
-          <span className="text-[10px] font-semibold uppercase text-muted-foreground">dia</span>
-        </div>
-      </section>
-
-      <section aria-labelledby="week-title" className="mt-4">
-        <div className="mb-2 flex items-center justify-between">
-          <h2 id="week-title" className="text-sm font-bold">Esta semana</h2>
-          <CalendarDays className="size-4 text-muted-foreground" aria-hidden="true" />
-        </div>
+      <section aria-label="Esta semana" className="pt-1">
         <ul className="grid grid-cols-7 gap-1.5">
-          {weekDays.map((day) => {
+          {weekDays.map((day, i) => {
             const active = day === today;
-            const hasData = dailyLogs.data?.some((log) => log.log_date === day) || moodLogs.data?.some((log) => log.log_date === day);
+            const hasData =
+              dailyLogs.data?.some((l) => l.log_date === day) || moodLogs.data?.some((l) => l.log_date === day);
             return (
               <li key={day}>
-                <Button
+                <button
                   type="button"
-                  variant={active ? "default" : "outline"}
                   aria-label={`Registrar ${formatShort(day)}`}
+                  aria-current={active ? "date" : undefined}
                   onClick={() => setSheetDate(day)}
-                  className={cn("h-16 w-full flex-col gap-0 rounded-2xl px-0 shadow-none", active && "border-foreground")}
+                  className={cn(
+                    "press flex h-16 w-full flex-col items-center justify-center rounded-2xl border bg-secondary transition-colors",
+                    active ? "border-2 border-neon bg-background" : "border-transparent",
+                  )}
                 >
-                  <span className="text-[10px] uppercase opacity-70">{formatShort(day).split(" ")[0]}</span>
+                  <span className="text-[11px] font-medium text-muted-foreground">{WEEK_LETTERS[i]}</span>
                   <span className="text-base font-bold">{Number(day.slice(-2))}</span>
-                  <span className={cn("mt-0.5 size-1 rounded-full", hasData ? "bg-neon" : "bg-transparent")} aria-hidden="true" />
-                </Button>
+                  <span className={cn("mt-0.5 size-1.5 rounded-full", hasData ? "bg-neon" : "bg-transparent")} aria-hidden="true" />
+                </button>
               </li>
             );
           })}
         </ul>
       </section>
 
-      <section className="mt-4 flex min-h-0 flex-1 flex-col justify-center" aria-label="Registro rápido">
-        <div className="rounded-2xl bg-secondary p-4 text-center">
-          <p className="text-sm font-semibold">{hasTodayData ? "Hoje já tem registros" : "Como foi seu dia?"}</p>
-          <p className="mt-1 text-xs text-muted-foreground">Fluxo, sintomas, humor e observações em um só lugar.</p>
-          <Button
-            size="icon"
-            className="mx-auto mt-4 size-16 rounded-full shadow-[var(--shadow-nav)]"
-            onClick={() => setSheetDate(today)}
-            aria-label={hasTodayData ? "Editar informações de hoje" : "Adicionar informações de hoje"}
-          >
-            <Plus className="size-7" aria-hidden="true" />
-          </Button>
-          <p className="mt-2 text-xs font-semibold">{hasTodayData ? "Editar hoje" : "Adicionar hoje"}</p>
+      <section aria-label="Status do ciclo" className="flex min-h-0 flex-1 items-center justify-center py-3">
+        <div
+          role="img"
+          aria-label={`${bigNumber} ${ringLabel}${phase ? `. Fase estimada ${phase.label}` : ""}`}
+          className="relative aspect-square h-full max-h-[260px] max-w-full"
+        >
+          <svg viewBox={`0 0 ${size} ${size}`} className="absolute inset-0 size-full -rotate-90" aria-hidden="true">
+            <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--border)" strokeWidth="4" />
+            <circle
+              cx={size / 2}
+              cy={size / 2}
+              r={r}
+              fill="none"
+              stroke="var(--neon)"
+              strokeWidth="5"
+              strokeLinecap="round"
+              strokeDasharray={c}
+              strokeDashoffset={c * (1 - ringRatio)}
+              className="transition-[stroke-dashoffset] duration-700 ease-out"
+            />
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center px-10 text-center">
+            <span className="text-6xl leading-none font-bold">{bigNumber}</span>
+            <span className="mt-2 text-sm text-muted-foreground">{ringLabel}</span>
+          </div>
         </div>
       </section>
+
+      <ul aria-label="Resumo rápido" className="grid grid-cols-3 gap-2">
+        <SummaryChip label="Humor" value={todayMood?.moods[0] ? moodLabel(todayMood.moods[0]) : "—"} />
+        <SummaryChip label="Fase" value={phase?.label ?? "—"} />
+        <SummaryChip label="Janela fértil" value={fertileLabel} />
+      </ul>
+
+      <div className="flex flex-col items-center py-4">
+        <button
+          type="button"
+          onClick={() => setSheetDate(today)}
+          aria-label={hasTodayData ? "Editar informações de hoje" : "Adicionar informações de hoje"}
+          className="press flex size-16 items-center justify-center rounded-full bg-primary text-primary-foreground ring-4 ring-neon/30 transition-transform"
+        >
+          <Plus className="size-7" aria-hidden="true" />
+        </button>
+        <span className="mt-1.5 text-xs font-medium">{hasTodayData ? "Editar hoje" : "Adicionar"}</span>
+      </div>
 
       <p className="pb-1 text-center text-[10px] leading-tight text-muted-foreground">
         Previsões são estimativas e não substituem orientação de saúde.
       </p>
       <DayLogSheet date={sheetDate} open={sheetDate !== null} onOpenChange={(open) => setSheetDate(open ? sheetDate : null)} />
     </div>
+  );
+}
+
+function SummaryChip({ label, value }: { label: string; value: string }) {
+  return (
+    <li className="flex min-h-14 flex-col items-center justify-center rounded-full bg-secondary px-2 text-center">
+      <span className="text-[10px] font-medium text-muted-foreground uppercase">{label}</span>
+      <span className="truncate text-sm font-bold capitalize">{value}</span>
+    </li>
   );
 }
