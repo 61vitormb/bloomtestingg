@@ -65,7 +65,7 @@ function MoodScreen() {
                   active ? "bg-primary text-primary-foreground" : "bg-secondary text-foreground",
                 )}
               >
-                <MoodShape shape={option.shape} from="currentColor" to="currentColor" size={30} />
+                <MoodShape mood={option.value} mono size={30} />
                 <span className="text-sm font-medium">{option.label}</span>
                 {active ? (
                   <Check className="absolute top-3 right-3 size-4 text-neon" aria-hidden="true" />
