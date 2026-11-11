@@ -1,5 +1,7 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { BottomNav } from "@/components/bloom/BottomNav";
+import { AppShell } from "@/components/bloom/AppShell";
+import { LogSheetProvider } from "@/components/bloom/LogSheetContext";
+import { ReminderRunner } from "@/components/bloom/ReminderRunner";
 
 export const Route = createFileRoute("/_authenticated/app")({
   component: AppLayout,
@@ -7,11 +9,11 @@ export const Route = createFileRoute("/_authenticated/app")({
 
 function AppLayout() {
   return (
-    <div className="min-h-dvh bg-background">
-      <main className="mx-auto h-dvh max-w-md overflow-y-auto px-4 pt-[max(16px,env(safe-area-inset-top))] pb-24">
+    <LogSheetProvider>
+      <AppShell>
         <Outlet />
-      </main>
-      <BottomNav />
-    </div>
+      </AppShell>
+      <ReminderRunner />
+    </LogSheetProvider>
   );
 }

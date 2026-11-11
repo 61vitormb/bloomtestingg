@@ -1,179 +1,199 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, History, Plus } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DayLogSheet } from "@/components/bloom/DayLogSheet";
-import { flowLabel, moodLabel, symptomLabel } from "@/domain/catalog";
-import { addDays, predictedPeriodDays, toISODate, type CycleRecord } from "@/domain/cycle";
-import { formatMonthYear, formatShort, formatWeekdayLong, todayISO } from "@/lib/format";
-import { useCycles, useDailyLogs, useMoodLogs, usePreferences } from "@/hooks/useBloomData";
+import { DayDetails } from "@/components/bloom/DayDetails";
+import { ErrorState, LoadingBloom, PageHeader } from "@/components/bloom/Feedback";
+import { useLogSheet } from "@/components/bloom/LogSheetContext";
+import {
+  CalendarLegend,
+  DayCell,
+  WEEKDAY_LETTERS,
+  buildMonthGrid,
+} from "@/components/bloom/MiniMonth";
+import { useCycleModel } from "@/hooks/useBloomData";
+import { formatMonthYear } from "@/lib/format";
+import { playSound } from "@/lib/sound";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/app/calendario")({
   head: () => ({
     meta: [
       { title: "Calendário — Bloom" },
-      { name: "description", content: "Calendário menstrual com sintomas, humor e datas estimadas." },
-      { property: "og:title", content: "Calendário — Bloom" },
-      { property: "og:description", content: "Registre e consulte cada dia do seu ciclo." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      {
+        name: "description",
+        content: "Calendário menstrual com registros, estimativas e janela fértil estimada.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
   component: CalendarScreen,
 });
 
-const WEEKDAYS = ["D", "S", "T", "Q", "Q", "S", "S"];
-
-export function buildMonthGrid(year: number, month: number): (string | null)[] {
-  const first = new Date(Date.UTC(year, month, 1));
-  const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
-  const cells: (string | null)[] = Array.from({ length: first.getUTCDay() }, () => null);
-  for (let day = 1; day <= daysInMonth; day += 1) cells.push(toISODate(new Date(Date.UTC(year, month, day))));
-  while (cells.length % 7 !== 0) cells.push(null);
-  return cells;
-}
-
 function CalendarScreen() {
-  const today = todayISO();
-  const now = new Date();
-  const [year, setYear] = useState(now.getFullYear());
-  const [month, setMonth] = useState(now.getMonth());
+  const model = useCycleModel();
+  const { today, dailyLogs, moodLogs } = model;
+  const { openLog } = useLogSheet();
+  const [cursor, setCursor] = useState(() => ({
+    year: Number(today.slice(0, 4)),
+    month: Number(today.slice(5, 7)) - 1,
+  }));
+  const [direction, setDirection] = useState<1 | -1>(1);
   const [selected, setSelected] = useState(today);
-  const [sheetOpen, setSheetOpen] = useState(false);
-  const cycles = useCycles();
-  const dailyLogs = useDailyLogs();
-  const moodLogs = useMoodLogs();
-  const preferences = usePreferences();
+  const touchX = useRef<number | null>(null);
 
-  const cycleRecords: CycleRecord[] = useMemo(
-    () => (cycles.data ?? []).map(({ id, start_date, end_date }) => ({ id, start_date, end_date })),
-    [cycles.data],
+  const cells = useMemo(() => buildMonthGrid(cursor.year, cursor.month), [cursor]);
+  const logged = useMemo(
+    () => new Set([...(dailyLogs.data ?? []), ...(moodLogs.data ?? [])].map((l) => l.log_date)),
+    [dailyLogs.data, moodLogs.data],
   );
-  const predicted = useMemo(
-    () => new Set(predictedPeriodDays(cycleRecords, {
-      cycleLength: preferences.data?.average_cycle_length ?? null,
-      periodLength: preferences.data?.average_period_length ?? null,
-    })),
-    [cycleRecords, preferences.data],
-  );
-  const cells = useMemo(() => buildMonthGrid(year, month), [year, month]);
-  const weekDays = useMemo(() => Array.from({ length: 7 }, (_, index) => addDays(selected, index - 3)), [selected]);
-  const selectedDaily = dailyLogs.data?.find((log) => log.log_date === selected) ?? null;
-  const selectedMood = moodLogs.data?.find((log) => log.log_date === selected) ?? null;
-  const selectedCycle = cycleRecords.find((cycle) => cycle.start_date <= selected && (cycle.end_date ?? cycle.start_date) >= selected);
+  const marks = {
+    recorded: model.recorded,
+    predicted: model.predicted,
+    fertile: model.fertile,
+    ovulation: model.ovulation,
+    logged,
+  };
 
-  function shiftMonth(delta: number) {
-    const next = new Date(Date.UTC(year, month + delta, 1));
-    setYear(next.getUTCFullYear());
-    setMonth(next.getUTCMonth());
-    setSelected(toISODate(next));
+  function shiftMonth(delta: 1 | -1) {
+    playSound("tap");
+    setDirection(delta);
+    setCursor(({ year, month }) => {
+      const d = new Date(year, month + delta, 1);
+      return { year: d.getFullYear(), month: d.getMonth() };
+    });
+  }
+  function goToday() {
+    setCursor({ year: Number(today.slice(0, 4)), month: Number(today.slice(5, 7)) - 1 });
+    setSelected(today);
   }
 
-  const agendaItems = [
-    selectedCycle ? (selectedCycle.start_date === selected ? "Início da menstruação" : "Menstruação registrada") : predicted.has(selected) ? "Menstruação estimada" : null,
-    selectedDaily?.flow_intensity ? `Fluxo ${flowLabel(selectedDaily.flow_intensity)?.toLowerCase()}` : null,
-    selectedDaily?.symptoms.length ? selectedDaily.symptoms.map(symptomLabel).join(", ") : null,
-    selectedMood?.moods.length ? selectedMood.moods.map(moodLabel).join(", ") : null,
-  ].filter((item): item is string => Boolean(item));
+  if (model.isLoading)
+    return <LoadingBloom label="Montando seu calendário…" className="min-h-[60vh]" />;
+  if (model.isError) return <ErrorState onRetry={() => void model.refetch()} />;
+
+  const selectedDaily = dailyLogs.data?.find((l) => l.log_date === selected) ?? null;
+  const selectedMood = moodLogs.data?.find((l) => l.log_date === selected) ?? null;
 
   return (
-    <div className="space-y-5">
-      <header className="grid grid-cols-[auto_1fr_auto] items-center gap-2">
-        <Button variant="ghost" size="icon" className="size-11 rounded-full" onClick={() => shiftMonth(-1)} aria-label="Mês anterior">
-          <ChevronLeft aria-hidden="true" />
-        </Button>
-        <h1 className="text-center text-3xl font-bold capitalize text-neon">{formatMonthYear(year, month)}</h1>
-        <div className="flex gap-1">
-          <Button variant="ghost" size="icon" className="size-11 rounded-full" onClick={() => shiftMonth(1)} aria-label="Próximo mês"><ChevronRight aria-hidden="true" /></Button>
-          <Button variant="default" size="icon" className="size-11 rounded-full" onClick={() => setSheetOpen(true)} aria-label={`Adicionar registro em ${formatShort(selected)}`}><Plus aria-hidden="true" /></Button>
-        </div>
-      </header>
-
-      <section aria-label="Semana selecionada">
-        <ul className="grid grid-cols-7 gap-1.5">
-          {weekDays.map((day) => {
-            const active = day === selected;
-            const hasRecord = dailyLogs.data?.some((log) => log.log_date === day) || moodLogs.data?.some((log) => log.log_date === day);
-            return (
-              <li key={day}>
-                <Button
-                  type="button"
-                  variant={active ? "default" : "ghost"}
-                  className="h-16 w-full flex-col gap-0 rounded-2xl px-0 shadow-none"
-                  aria-pressed={active}
-                  aria-label={formatWeekdayLong(day)}
-                  onClick={() => setSelected(day)}
-                >
-                  <span className="text-[10px] uppercase opacity-70">{formatShort(day).split(" ")[0]}</span>
-                  <span className="text-base font-bold">{Number(day.slice(-2))}</span>
-                  <span className={cn("mt-0.5 size-1 rounded-full", hasRecord ? "bg-neon" : "bg-transparent")} aria-hidden="true" />
-                </Button>
-              </li>
-            );
-          })}
-        </ul>
-      </section>
-
-      <section className="grid grid-cols-[1fr_auto] items-center border-y border-border py-4" aria-label="Resumo do dia">
-        <div>
-          <p className="text-xs text-muted-foreground">Registros do dia</p>
-          <p className="mt-1 text-2xl font-bold">{agendaItems.length}</p>
-        </div>
-        <div className="flex size-16 items-center justify-center rounded-full border-[6px] border-foreground text-sm font-bold">
-          {agendaItems.length ? "100%" : "0%"}
-        </div>
-      </section>
-
-      <section aria-labelledby="agenda-title">
-        <div className="flex items-center justify-between">
-          <h2 id="agenda-title" className="font-bold">Agenda do dia</h2>
-          <span className="text-xs text-muted-foreground">{agendaItems.length} {agendaItems.length === 1 ? "item" : "itens"}</span>
-        </div>
-        <div className="mt-3 rounded-2xl border border-border p-4">
-          {agendaItems.length ? (
-            <ul className="space-y-2">
-              {agendaItems.map((item) => <li key={item} className="flex items-start gap-2 text-sm"><span className="mt-1 size-2 shrink-0 rounded-full bg-neon" aria-hidden="true" />{item}</li>)}
-            </ul>
-          ) : (
-            <p className="text-sm text-muted-foreground">Nenhuma informação adicionada neste dia.</p>
-          )}
-          <Button className="mt-4 min-h-11 w-full rounded-full" onClick={() => setSheetOpen(true)}>
-            {agendaItems.length ? "Editar dia" : "Adicionar informações"}
+    <div>
+      <PageHeader
+        eyebrow="Calendário"
+        title="Seu mês"
+        description="Toque em um dia para consultar ou registrar. Tracejado e verde-água são estimativas."
+        actions={
+          <Button variant="outline" asChild className="rounded-full">
+            <Link to="/app/historico">
+              <History aria-hidden="true" /> Histórico de ciclos
+            </Link>
           </Button>
-        </div>
-      </section>
+        }
+      />
 
-      <details className="rounded-2xl border border-border p-4">
-        <summary className="cursor-pointer font-semibold">Ver mês completo</summary>
-        <div className="mt-4 grid grid-cols-7 gap-1 text-center text-xs text-muted-foreground">
-          {WEEKDAYS.map((day, index) => <span key={`${day}-${index}`}>{day}</span>)}
-        </div>
-        <div className="mt-1 grid grid-cols-7 gap-1">
-          {cells.map((iso, index) => iso ? (
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(320px,1fr)]">
+        <section aria-labelledby="month-title" className="bloom-card overflow-hidden p-4 md:p-6">
+          <div className="flex items-center justify-between gap-2">
             <Button
-              key={iso}
-              type="button"
-              variant={selected === iso ? "default" : "ghost"}
+              variant="ghost"
               size="icon"
-              className={cn("size-10 rounded-full", predicted.has(iso) && selected !== iso && "border border-dashed border-foreground")}
-              aria-label={formatWeekdayLong(iso)}
-              aria-pressed={selected === iso}
-              onClick={() => setSelected(iso)}
+              className="size-11 rounded-full"
+              onClick={() => shiftMonth(-1)}
+              aria-label="Mês anterior"
             >
-              {Number(iso.slice(-2))}
+              <ChevronLeft aria-hidden="true" />
             </Button>
-          ) : <span key={`empty-${index}`} className="size-10" aria-hidden="true" />)}
-        </div>
-        <div className="mt-3 flex justify-end">
-          <Button variant="ghost" size="sm" asChild className="min-h-11 rounded-full">
-            <Link to="/app/historico"><History aria-hidden="true" />Histórico de ciclos</Link>
-          </Button>
-        </div>
-      </details>
+            <div className="text-center">
+              <h2
+                id="month-title"
+                aria-live="polite"
+                className="text-xl font-bold first-letter:uppercase"
+              >
+                {formatMonthYear(cursor.year, cursor.month)}
+              </h2>
+              <button
+                type="button"
+                onClick={goToday}
+                className="text-xs font-semibold text-primary"
+              >
+                Ir para hoje
+              </button>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-11 rounded-full"
+              onClick={() => shiftMonth(1)}
+              aria-label="Próximo mês"
+            >
+              <ChevronRight aria-hidden="true" />
+            </Button>
+          </div>
 
-      <DayLogSheet date={selected} open={sheetOpen} onOpenChange={setSheetOpen} />
+          <div
+            className="mt-4 grid grid-cols-7 gap-1 text-center text-xs font-semibold text-muted-foreground"
+            aria-hidden="true"
+          >
+            {WEEKDAY_LETTERS.map((d, i) => (
+              <span key={i}>{d}</span>
+            ))}
+          </div>
+          <div
+            key={`${cursor.year}-${cursor.month}`}
+            className="mt-2 grid grid-cols-7 gap-y-2"
+            style={{
+              animation: `${direction === 1 ? "fade-up" : "fade-in"} 360ms cubic-bezier(0.2,0.8,0.2,1) both`,
+            }}
+            onTouchStart={(e) => (touchX.current = e.touches[0]?.clientX ?? null)}
+            onTouchEnd={(e) => {
+              if (touchX.current === null) return;
+              const dx = (e.changedTouches[0]?.clientX ?? 0) - touchX.current;
+              if (Math.abs(dx) > 60) shiftMonth(dx < 0 ? 1 : -1);
+              touchX.current = null;
+            }}
+            role="grid"
+            aria-label={formatMonthYear(cursor.year, cursor.month)}
+          >
+            {cells.map((iso, i) =>
+              iso ? (
+                <div key={iso} role="gridcell" className={cn("flex justify-center")}>
+                  <DayCell
+                    iso={iso}
+                    marks={marks}
+                    today={today}
+                    selected={selected === iso}
+                    onSelect={setSelected}
+                    size="lg"
+                  />
+                </div>
+              ) : (
+                <span key={`e-${i}`} aria-hidden="true" />
+              ),
+            )}
+          </div>
+          <CalendarLegend className="mt-6 border-t border-border pt-4" />
+        </section>
+
+        <aside aria-label="Dia selecionado" className="bloom-card h-fit p-5 lg:sticky lg:top-8">
+          <DayDetails
+            key={selected}
+            date={selected}
+            cycles={model.records}
+            daily={selectedDaily}
+            mood={selectedMood}
+            status={{
+              recorded: model.recorded.has(selected),
+              predicted: model.predicted.has(selected),
+              fertile: model.fertile.has(selected),
+              ovulation: model.ovulation.has(selected),
+            }}
+            onEdit={() => openLog(selected)}
+          />
+        </aside>
+      </div>
+      <p className="mt-6 text-center text-[11px] text-muted-foreground">
+        Janela fértil e ovulação são estimativas estatísticas e não servem como método
+        contraceptivo.
+      </p>
     </div>
   );
 }

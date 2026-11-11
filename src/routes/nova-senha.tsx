@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { AuthLayout } from "@/components/bloom/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -40,7 +41,11 @@ function ResetPassword() {
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     setError(null);
-    const parsed = z.string().min(8, "A senha precisa de pelo menos 8 caracteres.").max(72).safeParse(password);
+    const parsed = z
+      .string()
+      .min(8, "A senha precisa de pelo menos 8 caracteres.")
+      .max(72)
+      .safeParse(password);
     if (!parsed.success) {
       setError(parsed.error.issues[0]?.message ?? "Senha inválida.");
       return;
@@ -61,7 +66,7 @@ function ResetPassword() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-12">
+    <AuthLayout>
       <h1 className="text-3xl font-bold">Criar nova senha</h1>
       {!recoveryReady ? (
         <p className="mt-3 text-sm text-muted-foreground">
@@ -77,7 +82,7 @@ function ResetPassword() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="new-password"
-            className="min-h-12"
+            className="h-12 rounded-xl"
             required
           />
         </div>
@@ -89,7 +94,7 @@ function ResetPassword() {
             value={confirmation}
             onChange={(e) => setConfirmation(e.target.value)}
             autoComplete="new-password"
-            className="min-h-12"
+            className="h-12 rounded-xl"
             required
           />
         </div>
@@ -98,10 +103,10 @@ function ResetPassword() {
             {error}
           </p>
         ) : null}
-        <Button type="submit" disabled={busy} className="min-h-12 w-full">
+        <Button type="submit" disabled={busy} className="min-h-12 w-full rounded-full">
           {busy ? "Salvando…" : "Salvar nova senha"}
         </Button>
       </form>
-    </main>
+    </AuthLayout>
   );
 }

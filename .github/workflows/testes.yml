@@ -1,0 +1,50 @@
+name: Testes do Bloom
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CI: "true"
+      TZ: America/Sao_Paulo
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalar dependências
+        run: npm install --no-audit --no-fund
+
+      - name: Checagem de tipos
+        run: npm run typecheck
+
+      - name: Unitários, integração e aceitação + cobertura
+        run: npm run test:coverage
+
+      - name: Instalar navegador do Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Testes de sistema (E2E)
+        run: npm run test:e2e
+
+      - name: Consolidar métricas
+        if: always()
+        run: npm run metrics
+
+      - name: Publicar relatórios
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorios-de-teste
+          path: |
+            reports/
+            docs/evidencias/metricas-execucao.md
+          retention-days: 30

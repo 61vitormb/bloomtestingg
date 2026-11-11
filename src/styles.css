@@ -5,9 +5,10 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Bloom design system.
- * Jardim, pétalas e mudanças naturais. Tipografia exclusiva: DM Sans.
- * Todas as cores são tokens semânticos em oklch.
+ * Bloom Design System — "Jardim em florescer".
+ * Tipografia exclusiva: DM Sans. Paleta floral: pétala (rosa), folha-água (teal),
+ * pólen (âmbar) e lavanda. Fundos claros e quentes; profundidade sutil.
+ * Tokens semânticos — nenhuma cor "solta" nos componentes.
  */
 
 @theme inline {
@@ -16,11 +17,12 @@
   --radius-md: calc(var(--radius) - 3px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 6px);
-  --radius-2xl: calc(var(--radius) + 12px);
-  --radius-3xl: calc(var(--radius) + 20px);
+  --radius-2xl: calc(var(--radius) + 10px);
+  --radius-3xl: calc(var(--radius) + 18px);
   --radius-4xl: calc(var(--radius) + 28px);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
@@ -35,17 +37,24 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
-  --color-bloom-deep: var(--bloom-deep);
-  --color-bloom-green: var(--bloom-green);
-  --color-bloom-green-soft: var(--bloom-green-soft);
-  --color-bloom-pink: var(--bloom-pink);
-  --color-bloom-pink-soft: var(--bloom-pink-soft);
-  --color-bloom-lilac: var(--bloom-lilac);
-  --color-bloom-yellow: var(--bloom-yellow);
+  --color-ink: var(--ink);
+  --color-ink-foreground: var(--ink-foreground);
+  --color-neon: var(--primary);
+  --color-nav: var(--nav);
+  --color-nav-foreground: var(--nav-foreground);
+  --color-phase-menstrual: var(--phase-menstrual);
+  --color-phase-menstrual-soft: var(--phase-menstrual-soft);
+  --color-phase-follicular: var(--phase-follicular);
+  --color-phase-follicular-soft: var(--phase-follicular-soft);
+  --color-phase-ovulatory: var(--phase-ovulatory);
+  --color-phase-ovulatory-soft: var(--phase-ovulatory-soft);
+  --color-phase-luteal: var(--phase-luteal);
+  --color-phase-luteal-soft: var(--phase-luteal-soft);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -59,91 +68,144 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --color-nav: var(--nav);
-  --color-nav-foreground: var(--nav-foreground);
-  --color-neon: var(--neon);
+
+  --animate-fade-up: fade-up 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-fade-in: fade-in 400ms ease-out both;
+  --animate-scale-in: scale-in 420ms cubic-bezier(0.2, 0.9, 0.25, 1.15) both;
+  --animate-pop: pop 380ms cubic-bezier(0.3, 1.5, 0.5, 1) both;
+  --animate-bloom: bloom-open 900ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-shimmer: shimmer 1.6s linear infinite;
+  --animate-page: page-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 :root {
   --radius: 1rem;
 
-  /* Paleta Bloom */
-  --bloom-deep: oklch(0.13 0 0);
-  --bloom-green: oklch(0.25 0 0);
-  --bloom-green-soft: oklch(0.96 0 0);
-  --bloom-pink: oklch(0.68 0.28 350);
-  --bloom-pink-soft: oklch(0.96 0.025 350);
-  --bloom-lilac: oklch(0.42 0 0);
-  --bloom-yellow: oklch(0.7 0 0);
-  --neon: #ff2e93;
+  --background: #fbf7f4;
+  --surface: #f5eeea;
+  --foreground: #22172b;
+  --card: #ffffff;
+  --card-foreground: #22172b;
+  --popover: #ffffff;
+  --popover-foreground: #22172b;
+  --primary: #d52d63;
+  --primary-foreground: #ffffff;
+  --secondary: #f4ecee;
+  --secondary-foreground: #22172b;
+  --muted: #f4ecee;
+  --muted-foreground: #6e6273;
+  --accent: #fbe3ea;
+  --accent-foreground: #7d1238;
+  --destructive: #c62828;
+  --destructive-foreground: #ffffff;
+  --success: #1f8a5b;
+  --border: #ece2e5;
+  --input: #e5d9dd;
+  --ring: #d52d63;
+  --ink: #22172b;
+  --ink-foreground: #ffffff;
+  --nav: #ffffff;
+  --nav-foreground: #8a7d8e;
 
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.12 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.12 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.12 0 0);
-  --primary: #0a0a0a;
-  --primary-foreground: oklch(1 0 0);
-  --secondary: #f5f5f5;
-  --secondary-foreground: oklch(0.12 0 0);
-  --muted: #f5f5f5;
-  --muted-foreground: oklch(0.46 0 0);
-  --accent: oklch(0.94 0 0);
-  --accent-foreground: oklch(0.12 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.99 0.003 91);
-  --border: #e8e8e8;
-  --input: #e8e8e8;
-  --ring: oklch(0.12 0 0);
-  --nav: #0a0a0a;
-  --nav-foreground: oklch(0.72 0 0);
+  /* Fases do ciclo (inspiração: anel de ciclo com arcos de cor) */
+  --phase-menstrual: #e2365b;
+  --phase-menstrual-soft: #fcdbe2;
+  --phase-follicular: #e8962a;
+  --phase-follicular-soft: #fdecd3;
+  --phase-ovulatory: #127f90;
+  --phase-ovulatory-soft: #d2eef1;
+  --phase-luteal: #7c62dd;
+  --phase-luteal-soft: #e6e0fa;
 
-  --chart-1: oklch(0.12 0 0);
-  --chart-2: oklch(0.3 0 0);
-  --chart-3: oklch(0.46 0 0);
-  --chart-4: oklch(0.62 0 0);
-  --chart-5: oklch(0.78 0 0);
+  /* Pétalas — cores das categorias e humores */
+  --petal-rose: #ef4361;
+  --petal-pink: #ec5fa6;
+  --petal-coral: #ff6b3d;
+  --petal-amber: #f2a01f;
+  --petal-teal: #159fb3;
+  --petal-blue: #4f6bf5;
+  --petal-lilac: #9877ee;
+  --petal-sand: #c4ad9b;
+  --petal-slate: #7b8496;
+  --petal-green: #5bb54a;
 
-  --sidebar: oklch(1 0 0);
-  --sidebar-foreground: oklch(0.12 0 0);
-  --sidebar-primary: oklch(0.12 0 0);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.94 0 0);
-  --sidebar-accent-foreground: oklch(0.12 0 0);
-  --sidebar-border: oklch(0.88 0 0);
-  --sidebar-ring: oklch(0.12 0 0);
+  --chart-1: #d52d63;
+  --chart-2: #127f90;
+  --chart-3: #f2a01f;
+  --chart-4: #7c62dd;
+  --chart-5: #ff6b3d;
 
-  /* Texturas monocromáticas por fase */
-  --gradient-menstrual: radial-gradient(
-    circle at 50% 45%,
-    oklch(0.3 0 0 / 0.85),
-    oklch(0.92 0 0 / 0.35) 70%
-  );
-  --gradient-follicular: radial-gradient(
-    circle at 50% 45%,
-    oklch(0.55 0 0 / 0.8),
-    oklch(0.94 0 0 / 0.4) 70%
-  );
-  --gradient-ovulatory: radial-gradient(
-    circle at 50% 45%,
-    oklch(0.18 0 0 / 0.9),
-    oklch(0.94 0 0 / 0.35) 72%
-  );
-  --gradient-luteal: radial-gradient(
-    circle at 50% 45%,
-    oklch(0.42 0 0 / 0.8),
-    oklch(0.92 0 0 / 0.35) 72%
-  );
-  --gradient-bloom: linear-gradient(
-    135deg,
-    oklch(0.12 0 0),
-    oklch(0.42 0 0) 55%,
-    oklch(0.72 0 0)
-  );
-  --shadow-petal: 0 14px 30px -22px oklch(0.12 0 0 / 0.35);
-  --shadow-soft: 0 2px 12px -8px oklch(0.12 0 0 / 0.22);
-  --shadow-nav: 0 12px 32px -16px oklch(0.12 0 0 / 0.55);
+  --sidebar: #ffffff;
+  --sidebar-foreground: #22172b;
+  --sidebar-primary: #d52d63;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #fbe3ea;
+  --sidebar-accent-foreground: #7d1238;
+  --sidebar-border: #ece2e5;
+  --sidebar-ring: #d52d63;
+
+  --shadow-xs: 0 1px 2px rgb(34 23 43 / 0.05);
+  --shadow-soft: 0 1px 2px rgb(34 23 43 / 0.04), 0 8px 24px -12px rgb(34 23 43 / 0.14);
+  --shadow-lift: 0 2px 6px rgb(34 23 43 / 0.05), 0 18px 40px -18px rgb(34 23 43 / 0.25);
+  --shadow-nav: 0 -1px 0 rgb(34 23 43 / 0.04), 0 -12px 32px -20px rgb(34 23 43 / 0.25);
+  --shadow-glow: 0 10px 30px -10px rgb(213 45 99 / 0.55);
+  --shadow-petal: var(--shadow-soft);
+
+  --gradient-bloom: radial-gradient(120% 90% at 15% 20%, #ff8fb1 0%, transparent 55%),
+    radial-gradient(90% 80% at 85% 15%, #ffb36b 0%, transparent 55%),
+    radial-gradient(100% 90% at 70% 100%, #8b7bff 0%, transparent 60%), #e8456f;
+  --gradient-dawn: radial-gradient(100% 120% at 0% 0%, #ffe1ea 0%, transparent 60%),
+    radial-gradient(100% 120% at 100% 0%, #fff1dc 0%, transparent 55%),
+    radial-gradient(120% 100% at 50% 100%, #e9e3ff 0%, transparent 60%), var(--background);
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.dark {
+  --background: #120c16;
+  --surface: #1a131f;
+  --foreground: #f7eef3;
+  --card: #1d1523;
+  --card-foreground: #f7eef3;
+  --popover: #221a29;
+  --popover-foreground: #f7eef3;
+  --primary: #ff5a8a;
+  --primary-foreground: #1b0710;
+  --secondary: #2a2030;
+  --secondary-foreground: #f7eef3;
+  --muted: #2a2030;
+  --muted-foreground: #ab9db0;
+  --accent: #3a1a2a;
+  --accent-foreground: #ffc2d5;
+  --destructive: #ff6b6b;
+  --destructive-foreground: #1b0707;
+  --success: #4ccf8f;
+  --border: #30253a;
+  --input: #3a2e44;
+  --ring: #ff5a8a;
+  --ink: #f7eef3;
+  --ink-foreground: #160e1a;
+  --nav: #1a131f;
+  --nav-foreground: #9a8c9f;
+  --phase-menstrual: #ff5c7d;
+  --phase-menstrual-soft: #44192a;
+  --phase-follicular: #ffb455;
+  --phase-follicular-soft: #3b2a15;
+  --phase-ovulatory: #36c3d6;
+  --phase-ovulatory-soft: #12333a;
+  --phase-luteal: #a990ff;
+  --phase-luteal-soft: #2a2246;
+  --sidebar: #160f1b;
+  --sidebar-foreground: #f7eef3;
+  --sidebar-accent: #3a1a2a;
+  --sidebar-accent-foreground: #ffc2d5;
+  --sidebar-border: #2a2030;
+  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -12px rgb(0 0 0 / 0.6);
+  --shadow-lift: 0 2px 6px rgb(0 0 0 / 0.3), 0 18px 40px -18px rgb(0 0 0 / 0.7);
+  --shadow-nav: 0 -12px 32px -20px rgb(0 0 0 / 0.8);
+  --gradient-dawn: radial-gradient(100% 120% at 0% 0%, #3a1426 0%, transparent 60%),
+    radial-gradient(100% 120% at 100% 0%, #2c1d10 0%, transparent 55%),
+    radial-gradient(120% 100% at 50% 100%, #1d1a3d 0%, transparent 60%), var(--background);
 }
 
 @layer base {
@@ -153,6 +215,10 @@
 
   html {
     -webkit-text-size-adjust: 100%;
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
   }
 
   body {
@@ -160,11 +226,18 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     font-synthesis-weight: none;
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "ss01", "cv11";
   }
 
   :focus-visible {
     outline: 2px solid var(--ring);
     outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: var(--accent-foreground);
   }
 }
 
@@ -172,60 +245,203 @@
   .bloom-card {
     background-color: var(--card);
     border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
+    border-radius: calc(var(--radius) + 8px);
     box-shadow: var(--shadow-soft);
+  }
+
+  .bloom-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 2.75rem;
+    padding-inline: 1rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease,
+      transform 160ms ease, box-shadow 180ms ease;
+  }
+  .bloom-chip:hover {
+    background: var(--secondary);
+  }
+  .bloom-chip[aria-pressed="true"] {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--ink-foreground);
+    box-shadow: var(--shadow-soft);
+  }
+  .bloom-chip:active {
+    transform: scale(0.96);
+  }
+
+  .eyebrow {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
   }
 
   .settings-row {
     display: flex;
     min-height: 3.5rem;
+    width: 100%;
     cursor: pointer;
     list-style: none;
     align-items: center;
     gap: 0.75rem;
     padding-inline: 1rem;
-    font-size: 0.875rem;
+    font-size: 0.9rem;
     font-weight: 500;
+    text-align: left;
+    transition: background-color 160ms ease;
   }
-
+  .settings-row:hover {
+    background: var(--secondary);
+  }
   .settings-row::-webkit-details-marker {
     display: none;
   }
-
   .settings-row > svg:first-child {
     width: 1.125rem;
     height: 1.125rem;
+    flex: none;
+    color: var(--muted-foreground);
   }
-
-  .settings-row > span {
+  .settings-row > span:first-of-type {
     flex: 1;
-    text-align: left;
   }
-
+  details[open] > .settings-row > svg:last-child {
+    transform: rotate(90deg);
+  }
   .settings-row > svg:last-child {
     width: 1rem;
     height: 1rem;
     color: var(--muted-foreground);
+    transition: transform 200ms ease;
+  }
+
+  .stagger > * {
+    animation: fade-up 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    animation-delay: calc(var(--i, 0) * 55ms);
+  }
+  .stagger > *:nth-child(1) { --i: 0; }
+  .stagger > *:nth-child(2) { --i: 1; }
+  .stagger > *:nth-child(3) { --i: 2; }
+  .stagger > *:nth-child(4) { --i: 3; }
+  .stagger > *:nth-child(5) { --i: 4; }
+  .stagger > *:nth-child(6) { --i: 5; }
+  .stagger > *:nth-child(7) { --i: 6; }
+  .stagger > *:nth-child(8) { --i: 7; }
+  .stagger > *:nth-child(n + 9) { --i: 8; }
+
+  .skeleton {
+    background: linear-gradient(90deg, var(--muted) 0%, var(--card) 50%, var(--muted) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.6s linear infinite;
+    border-radius: 1rem;
   }
 }
 
 @utility press {
   transition: transform 150ms ease;
   &:active {
-    transform: scale(0.97);
+    transform: scale(0.96);
   }
 }
 
 @utility bloom-gradient {
-  background-image: var(--gradient-bloom);
+  background: var(--gradient-bloom);
 }
 
+@utility dawn {
+  background: var(--gradient-dawn);
+}
+
+/* Textura granulada (inspirada em gradientes com ruído) — puramente decorativa */
+@utility grain {
+  position: relative;
+  isolation: isolate;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--grain);
+    opacity: 0.22;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    border-radius: inherit;
+    z-index: 0;
+  }
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes pop {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+@keyframes bloom-open {
+  from { opacity: 0; transform: scale(0.6) rotate(-20deg); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(8px); filter: blur(2px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+@keyframes ring-draw {
+  from { stroke-dashoffset: var(--ring-length, 600); }
+}
+@keyframes petal-burst {
+  0% { opacity: 1; transform: translate(0, 0) scale(0.4) rotate(0deg); }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1) rotate(var(--rot)); }
+}
+
+/* Respeita "reduzir movimento" do sistema operacional */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.001ms !important;
+    animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
+}
+html.reduce-motion *,
+html.reduce-motion *::before,
+html.reduce-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-delay: 0ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
 }

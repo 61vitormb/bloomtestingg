@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="199" failures="0" errors="0" time="4.219055046">
+    <testsuite name="tests/acceptance/registro-diario.test.tsx" timestamp="2026-11-11T23:38:56.411Z" hostname="vm" tests="14" failures="0" errors="0" skipped="0" time="3.716852583">
+        <testcase classname="tests/acceptance/registro-diario.test.tsx" name="Cenário: registrar o início da menstruação &gt; [AT-01] CA1 o início é salvo com a data do dia; CA2 o botão passa a oferecer a remoção" time="0.505673346">
+        </testcase>
+        <testcase classname="tests/acceptance/registro-diario.test.tsx" name="Cenário: registrar o início da menstruação &gt; [AT-02] CA a usuária não consegue registrar início em data futura" time="0.190743121">
+        </testcase>
+        <testcase classname="tests/acceptance/registro-diario.test.tsx" name="Cenário: registrar o início da menstruação &gt; [AT-03] CA início muito próximo do anterior exige confirmação explícita antes de salvar" time="0.317230264">
+        </testcase>
+        <testcase classname="tests/acceptance/registro-diario.test.tsx" name="Cenário: registrar o início da menstruação &gt; [AT-04] CA data dentro de uma menstruação registrada é recusada com mensagem" time="0.160521039">
+        </testcase>
+        <testcase classname="tests/acceptance/registro-diario.test.tsx" name="Cenário: registrar o início da menstruação &gt; [AT-05] CA registrar o fim fecha o ciclo aberto na data escolhida" time="0.340103097">
+        </testcase>
+        <testcase classname="tests/acceptance/registro-diario.test.tsx" name="Cenário: registrar sintomas e humor &gt; [AT-06] CA1 todas as categorias escolhidas são salvas; CA2 a folha fecha após a confirmação da nuvem" time="0.675800042">
+        </testcase>
+        <testcase classname="tests/acceptance/registro-diario.test.tsx" name="Cenário: registrar sintomas e humor &gt; [AT-07] CA editar um registro existente: campos vêm preenchidos e a alteração substitui o anterior" time="0.659046194">
+        </testcase>
+        <testcase classname="tests/acceptance/registro-diario.test.tsx" name="Cenário: registrar sintomas e humor &gt; [AT-08] CA cancelar não grava nada" time="0.212171804">
+        </testcase>
+        <testcase classname="tests/acceptance/registro-diario.test.tsx" name="Cenário: registrar sintomas e humor &gt; [AT-09] CA falha de conexão mantém a folha aberta com os dados preenchidos" time="0.248204216">
+        </testcase>
+        <testcase classname="tests/acceptance/registro-diario.test.tsx" name="Cenário: registrar sintomas e humor &gt; [AT-10] CA sons são opcionais: nenhum áudio é criado com a configuração padrão" time="0.223436166">
+        </testcase>
+        <testcase classname="tests/acceptance/registro-diario.test.tsx" name="Cenário: consultar, diferenciar estimativas e excluir um dia &gt; [AT-11] CA o dia mostra os registros e diferencia menstruação registrada de estimada" time="0.020959531">
+        </testcase>
+        <testcase classname="tests/acceptance/registro-diario.test.tsx" name="Cenário: consultar, diferenciar estimativas e excluir um dia &gt; [AT-12] CA excluir os registros do dia pede confirmação e remove apenas aquele dia" time="0.020980808">
+        </testcase>
+        <testcase classname="tests/acceptance/registro-diario.test.tsx" name="Cenário: consultar, diferenciar estimativas e excluir um dia &gt; [AT-13] CA se a usuária desiste na confirmação, nada é apagado" time="0.014435074">
+        </testcase>
+        <testcase classname="tests/acceptance/registro-diario.test.tsx" name="Regressão DEF-014 &gt; [AT-14] CA ações de menstruação ficam desabilitadas enquanto o histórico carrega" time="0.125196414">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/integration/hooks.test.tsx" timestamp="2026-11-11T23:38:56.414Z" hostname="vm" tests="4" failures="0" errors="0" skipped="0" time="0.305258377">
+        <testcase classname="tests/integration/hooks.test.tsx" name="hooks do Bloom &gt; [IT-HK-01] registrar menstruação atualiza o modelo do ciclo (calendário e dashboard)" time="0.132536026">
+        </testcase>
+        <testcase classname="tests/integration/hooks.test.tsx" name="hooks do Bloom &gt; [IT-HK-02] padrão declarado nas preferências muda a previsão" time="0.059201831">
+        </testcase>
+        <testcase classname="tests/integration/hooks.test.tsx" name="hooks do Bloom &gt; [IT-HK-03] falha de rede na gravação mostra erro e não altera o modelo" time="0.056371536">
+        </testcase>
+        <testcase classname="tests/integration/hooks.test.tsx" name="hooks do Bloom &gt; [IT-HK-04] erro de leitura é exposto para a tela mostrar o estado de erro" time="0.054977893">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/integration/services.test.ts" timestamp="2026-11-11T23:38:56.414Z" hostname="vm" tests="30" failures="0" errors="0" skipped="0" time="0.039026262">
+        <testcase classname="tests/integration/services.test.ts" name="autenticação ⇄ perfil &gt; [IT-AUTH-01] conta nova tem perfil e preferências padrão acessíveis só por ela" time="0.004994026">
+        </testcase>
+        <testcase classname="tests/integration/services.test.ts" name="autenticação ⇄ perfil &gt; [IT-AUTH-02] sem sessão, gravações são bloqueadas com mensagem clara" time="0.003034378">
+        </testcase>
+        <testcase classname="tests/integration/services.test.ts" name="autenticação ⇄ perfil &gt; [IT-AUTH-03] atualizar perfil grava na conta autenticada" time="0.000752912">
+        </testcase>
+        <testcase classname="tests/integration/services.test.ts" name="frontend ⇄ banco (isolamento por usuária) &gt; [IT-DB-01] Bia não enxerga nem altera os ciclos da Ana" time="0.002015264">
+        </testcase>
+        <testcase classname="tests/integration/services.test.ts" name="frontend ⇄ banco (isolamento por usuária) &gt; [IT-DB-02] tentativa de gravar com user_id alheio é barrada pela política (RLS)" time="0.000596233">
+        </testcase>
+        <testcase classname="tests/integration/services.test.ts" name="frontend ⇄ banco (isolamento por usuária) &gt; [IT-DB-03] registro diário: um por dia, edição sobrescreve sem duplicar" time="0.001557362">
+        </testcase>
+        <testcase classname="tests/integration/services.test.ts" name="frontend ⇄ banco (isolamento por usuária) &gt; [IT-DB-04] DEF-005: salvar registro vazio remove o registro existente" time="0.000492338">
+        </testcase>
+        <testcase classname="tests/integration/services.test.ts" name="frontend ⇄ banco (isolamento por usuária) &gt; [IT-DB-05] DEF-004: limpar todos os humores remove o registro de humor do dia" time="0.000776041">
+        </testcase>
+        <testcase classname="tests/integration/services.test.ts" name="frontend ⇄ banco (isolamento por usuária) &gt; [IT-DB-06] dados inválidos são barrados antes de chegar ao banco" time="0.000956205">
+        </testcase>
+        <testcase classname="tests/integration/services.test.ts" name="frontend ⇄ banco (isolamento por usuária) &gt; [IT-DB-07] tokens de sintomas desconhecidos são descartados na gravação" time="0.000349972">
+        </testcase>
+        <testcase classname="tests/integration/services.test.ts" name="frontend ⇄ banco (isolamento por usuária) &gt; [IT-DB-08] intensidade do humor é normalizada e zerada quando não há humor" time="0.000375397">
+        </testcase>
+        <testcase classname="tests/integration/services.test.ts" name="frontend ⇄ banco (isolamento por usuária) &gt; [IT-DB-09] diário preserva fluxo e sintomas ao salvar só a anotação" time="0.000507652">
+        </testcase>
+        <testcase classname="tests/integration/services.test.ts" name="registro menstrual ⇄ histórico ⇄ calendário ⇄ estatísticas &gt; [IT-HIS-01] ciclos registrados aparecem no histórico em ordem e com durações" time="0.00866311">
+        </testcase>
+        <testcase classname="tests/integration/services.test.ts" name="registro menstrual ⇄ histórico ⇄ calendário ⇄ estatísticas &gt; [IT-CAL-01] calendário reflete o registro: dias registrados e próxima previsão" time="0.001001291">
+        </testcase>
+        <testcase classname="tests/integration/services.test.ts" name="registro menstrual ⇄ histórico ⇄ calendário ⇄ estatísticas &gt; [IT-CAL-02] editar o fim da menstruação atualiza o cálculo" time="0.000509613">
+        </testcase>
+        <testcase classname="tests/integration/services.test.ts" name="registro menstrual ⇄ histórico ⇄ calendário ⇄ estatísticas &gt; [IT-STA-01] registros diários alimentam as estatísticas do período" time="0.001585874">
+        </testcase>
+        <testcase classname="tests/integration/services.test.ts" name="exportação de dados &gt; [IT-EXP-01] exporta somente os dados da própria usuária, em formato documentado" time="0.000662167">
+        </testcase>
+        <testcase classname="tests/integration/services.test.ts" name="exportação de dados &gt; [IT-EXP-02] CSV do histórico gerado a partir da nuvem" time="0.001000998">
+        </testcase>
+        <testcase classname="tests/integration/services.test.ts" name="configurações e persistência &gt; [IT-CFG-01] preferências do ciclo persistem e são relidas" time="0.000574445">
+        </testcase>
+        <testcase classname="tests/integration/services.test.ts" name="configurações e persistência &gt; [IT-CFG-02] valores fora dos limites não são gravados" time="0.000563977">
+        </testcase>
+        <testcase classname="tests/integration/services.test.ts" name="configurações e persistência &gt; [IT-CFG-03] troca de senha valida a regra e trata a senha repetida" time="0.000979141">
+        </testcase>
+        <testcase classname="tests/integration/services.test.ts" name="configurações e persistência &gt; [IT-CFG-04] encerrar outras sessões mantém a sessão atual" time="0.000447313">
+        </testcase>
+        <testcase classname="tests/integration/services.test.ts" name="exclusão de dados &gt; [IT-DEL-01] apagar registros remove ciclos, diários e humores da usuária — e só dela" time="0.000814012">
+        </testcase>
+        <testcase classname="tests/integration/services.test.ts" name="exclusão de dados &gt; [IT-DEL-02] excluir conta chama a função de servidor e encerra a sessão local" time="0.001012035">
+        </testcase>
+        <testcase classname="tests/integration/services.test.ts" name="exclusão de dados &gt; [IT-DEL-03] falha na exclusão da conta não encerra a sessão e informa a usuária" time="0.000441624">
+        </testcase>
+        <testcase classname="tests/integration/services.test.ts" name="falhas de comunicação e respostas inválidas &gt; [IT-ERR-01] queda de rede vira mensagem amigável que preserva o formulário" time="0.000382052">
+        </testcase>
+        <testcase classname="tests/integration/services.test.ts" name="falhas de comunicação e respostas inválidas &gt; [IT-ERR-02] erro interno do servidor não expõe detalhes técnicos" time="0.000455845">
+        </testcase>
+        <testcase classname="tests/integration/services.test.ts" name="falhas de comunicação e respostas inválidas &gt; [IT-ERR-03] resposta em formato inesperado é rejeitada" time="0.000265833">
+        </testcase>
+        <testcase classname="tests/integration/services.test.ts" name="falhas de comunicação e respostas inválidas &gt; [IT-ERR-04] sintomas nulos vindos do banco são tratados como lista vazia" time="0.000415035">
+        </testcase>
+        <testcase classname="tests/integration/services.test.ts" name="falhas de comunicação e respostas inválidas &gt; [IT-ERR-05] menstruação duplicada no mesmo dia é recusada pelo banco" time="0.000363588">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/unit/cycle.test.ts" timestamp="2026-11-11T23:38:56.421Z" hostname="vm" tests="47" failures="0" errors="0" skipped="0" time="0.02092179">
+        <testcase classname="tests/unit/cycle.test.ts" name="datas &gt; [UT-CYC-01] soma dias atravessando o mês" time="0.002106339">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="datas &gt; [UT-CYC-02] conta a diferença em dias" time="0.0001996">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="médias do ciclo &gt; [UT-CYC-03] calcula as durações entre menstruações" time="0.00808252">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="médias do ciclo &gt; [UT-CYC-04] usa os ciclos registrados em vez do valor de referência" time="0.000266144">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="médias do ciclo &gt; [UT-CYC-05] volta para o valor informado quando não há ciclos" time="0.000198981">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="médias do ciclo &gt; [UT-CYC-06] calcula a duração média do sangramento" time="0.000193447">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="médias do ciclo &gt; [UT-CYC-07] mede a variação entre ciclos" time="0.00013066">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="previsões &gt; [UT-CYC-08] prevê a próxima menstruação a partir do último início" time="0.000171495">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="previsões &gt; [UT-CYC-09] marca os dias estimados de menstruação" time="0.000987958">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="previsões &gt; [UT-CYC-10] calcula o dia atual do ciclo" time="0.000157391">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="previsões &gt; [UT-CYC-11] não devolve previsão sem nenhum ciclo" time="0.000134651">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="fases &gt; [UT-CYC-12] classifica o primeiro dia como menstrual" time="0.000136468">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="fases &gt; [UT-CYC-13] classifica a fase lútea depois da ovulação" time="0.000089087">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="fases &gt; [UT-CYC-14] classifica a janela ovulatória estimada" time="0.000089679">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="validação de registros &gt; [UT-CYC-15] rejeita datas futuras" time="0.000328856">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="validação de registros &gt; [UT-CYC-16] rejeita fim antes do início" time="0.000219644">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="validação de registros &gt; [UT-CYC-17] rejeita duas menstruações no mesmo dia" time="0.000135351">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="validação de registros &gt; [UT-CYC-18] aceita ciclos irregulares apenas com aviso" time="0.000122717">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="datas — limites e fuso horário &gt; [UT-CYC-30] DEF-001: data ISO interpretada ao meio-dia UTC não muda de dia em UTC-3" time="0.000132745">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="datas — limites e fuso horário &gt; [UT-CYC-31] DEF-003: dia da semana independe do fuso (11/11/2026 é quarta-feira)" time="0.000150918">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="datas — limites e fuso horário &gt; [UT-CYC-32] soma dias atravessando ano bissexto" time="0.000163303">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="datas — limites e fuso horário &gt; [UT-CYC-33] diferença negativa quando a data final é anterior" time="0.00009182">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="datas — limites e fuso horário &gt; [UT-CYC-34] isValidISODate(2026-02-30) = false" time="0.000139493">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="datas — limites e fuso horário &gt; [UT-CYC-34] isValidISODate(2026-13-01) = false" time="0.000086132">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="datas — limites e fuso horário &gt; [UT-CYC-34] isValidISODate(26-01-01) = false" time="0.000074411">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="datas — limites e fuso horário &gt; [UT-CYC-34] isValidISODate(2026-1-1) = false" time="0.000071494">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="datas — limites e fuso horário &gt; [UT-CYC-34] isValidISODate() = false" time="0.000072327">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="datas — limites e fuso horário &gt; [UT-CYC-34] isValidISODate(abc) = false" time="0.000073473">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="datas — limites e fuso horário &gt; [UT-CYC-34] isValidISODate(2028-02-29) = true" time="0.000074053">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="datas — limites e fuso horário &gt; [UT-CYC-34] isValidISODate(2026-02-29) = false" time="0.000074248">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="durações — casos limite &gt; [UT-CYC-35] menstruação de um único dia tem duração 1" time="0.000151704">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="durações — casos limite &gt; [UT-CYC-36] ciclos fora da faixa plausível (15–90) não entram na média" time="0.000144133">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="durações — casos limite &gt; [UT-CYC-37] limites exatos 15 e 90 são aceitos na média" time="0.000253414">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="durações — casos limite &gt; [UT-CYC-38] usa só os 6 ciclos mais recentes na média" time="0.000177899">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="durações — casos limite &gt; [UT-CYC-39] confiança cresce com o número de ciclos" time="0.000125393">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="visão geral e projeções &gt; [UT-CYC-40] overview sem registros não inventa dia do ciclo nem fase" time="0.000224676">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="visão geral e projeções &gt; [UT-CYC-41] overview usa o padrão declarado quando não há ciclos completos" time="0.000184712">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="visão geral e projeções &gt; [UT-CYC-42] dias registrados: ciclo em aberto é limitado à duração média e a hoje" time="0.000275544">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="visão geral e projeções &gt; [UT-CYC-43] dias registrados incluem início e fim" time="0.000157393">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="visão geral e projeções &gt; [UT-CYC-44] dia do ciclo para datas passadas usa o início anterior mais próximo" time="0.000172721">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="visão geral e projeções &gt; [UT-CYC-45] projeções: janela fértil de 7 dias e ovulação 14 dias antes do próximo ciclo" time="0.000589373">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="visão geral e projeções &gt; [UT-CYC-46] projeções vazias sem nenhum registro" time="0.000114662">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="validação — sobreposição e avisos &gt; [UT-CYC-47] rejeita início dentro de uma menstruação já registrada" time="0.000221754">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="validação — sobreposição e avisos &gt; [UT-CYC-48] avisa (sem bloquear) sangramento maior que 15 dias" time="0.000151402">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="validação — sobreposição e avisos &gt; [UT-CYC-49] avisa intervalo longo desde o ciclo anterior" time="0.000136088">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="validação — sobreposição e avisos &gt; [UT-CYC-50] data de início inválida interrompe a validação com erro" time="0.000163354">
+        </testcase>
+        <testcase classname="tests/unit/cycle.test.ts" name="validação — sobreposição e avisos &gt; [UT-CYC-51] ao editar, o próprio ciclo é ignorado na checagem de duplicidade" time="0.000124718">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/unit/export.test.ts" timestamp="2026-11-11T23:38:56.429Z" hostname="vm" tests="6" failures="0" errors="0" skipped="0" time="0.020789614">
+        <testcase classname="tests/unit/export.test.ts" name="exportação &gt; [UT-EXP-01] protege contra injeção de fórmula em planilhas" time="0.002280658">
+        </testcase>
+        <testcase classname="tests/unit/export.test.ts" name="exportação &gt; [UT-EXP-02] escapa separador, aspas e quebra de linha" time="0.0002876">
+        </testcase>
+        <testcase classname="tests/unit/export.test.ts" name="exportação &gt; [UT-EXP-03] CSV do histórico traz rótulos legíveis e todas as categorias" time="0.015706016">
+        </testcase>
+        <testcase classname="tests/unit/export.test.ts" name="exportação &gt; [UT-EXP-04] CSV respeita o filtro de período" time="0.000365238">
+        </testcase>
+        <testcase classname="tests/unit/export.test.ts" name="exportação &gt; [UT-EXP-05] CSV vazio mantém o cabeçalho" time="0.000163602">
+        </testcase>
+        <testcase classname="tests/unit/export.test.ts" name="exportação &gt; [UT-EXP-06] nome de arquivo previsível" time="0.000132602">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/unit/format.test.ts" timestamp="2026-11-11T23:38:56.430Z" hostname="vm" tests="13" failures="0" errors="0" skipped="0" time="0.007500226">
+        <testcase classname="tests/unit/format.test.ts" name="formatação de datas (fuso America/Sao_Paulo) &gt; [UT-FMT-01] o ambiente de teste está realmente em UTC-3 (pré-condição dos testes de regressão)" time="0.0020186">
+        </testcase>
+        <testcase classname="tests/unit/format.test.ts" name="formatação de datas (fuso America/Sao_Paulo) &gt; [UT-FMT-02] DEF-001: formatShort mostra o mesmo dia da data ISO" time="0.001018834">
+        </testcase>
+        <testcase classname="tests/unit/format.test.ts" name="formatação de datas (fuso America/Sao_Paulo) &gt; [UT-FMT-03] DEF-002: cabeçalho do calendário mostra o mês correto" time="0.000293421">
+        </testcase>
+        <testcase classname="tests/unit/format.test.ts" name="formatação de datas (fuso America/Sao_Paulo) &gt; [UT-FMT-04] formatos longos, curtos e com dia da semana" time="0.000348442">
+        </testcase>
+        <testcase classname="tests/unit/format.test.ts" name="formatação de datas (fuso America/Sao_Paulo) &gt; [UT-FMT-05] todayISO usa a data local do aparelho" time="0.000235576">
+        </testcase>
+        <testcase classname="tests/unit/format.test.ts" name="formatação de datas (fuso America/Sao_Paulo) &gt; [UT-FMT-06] isoToLocalDate cria data local ao meio-dia" time="0.000835355">
+        </testcase>
+        <testcase classname="tests/unit/format.test.ts" name="textos auxiliares &gt; [UT-FMT-07] relativeDaysLabel(0) = hoje" time="0.000174667">
+        </testcase>
+        <testcase classname="tests/unit/format.test.ts" name="textos auxiliares &gt; [UT-FMT-07] relativeDaysLabel(1) = amanhã" time="0.000081336">
+        </testcase>
+        <testcase classname="tests/unit/format.test.ts" name="textos auxiliares &gt; [UT-FMT-07] relativeDaysLabel(-1) = ontem" time="0.000070932">
+        </testcase>
+        <testcase classname="tests/unit/format.test.ts" name="textos auxiliares &gt; [UT-FMT-07] relativeDaysLabel(5) = em 5 dias" time="0.000099074">
+        </testcase>
+        <testcase classname="tests/unit/format.test.ts" name="textos auxiliares &gt; [UT-FMT-07] relativeDaysLabel(-3) = há 3 dias" time="0.000072344">
+        </testcase>
+        <testcase classname="tests/unit/format.test.ts" name="textos auxiliares &gt; [UT-FMT-08] saudação conforme o horário, com e sem nome" time="0.000183128">
+        </testcase>
+        <testcase classname="tests/unit/format.test.ts" name="textos auxiliares &gt; [UT-FMT-09] pluralize" time="0.000123828">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/unit/insights.test.ts" timestamp="2026-11-11T23:38:56.435Z" hostname="vm" tests="7" failures="0" errors="0" skipped="0" time="0.023943951">
+        <testcase classname="tests/unit/insights.test.ts" name="insights pessoais &gt; [UT-INS-01] sem dados não gera insights" time="0.003051543">
+        </testcase>
+        <testcase classname="tests/unit/insights.test.ts" name="insights pessoais &gt; [UT-INS-02] ciclos regulares: comparação, variação, sintoma recorrente e humor por fase" time="0.016281617">
+        </testcase>
+        <testcase classname="tests/unit/insights.test.ts" name="insights pessoais &gt; [UT-INS-03] sintoma recorrente informa a faixa de dias do ciclo" time="0.00062322">
+        </testcase>
+        <testcase classname="tests/unit/insights.test.ts" name="insights pessoais &gt; [UT-INS-04] ciclos irregulares geram aviso de variação alta" time="0.000392478">
+        </testcase>
+        <testcase classname="tests/unit/insights.test.ts" name="insights pessoais &gt; [UT-INS-05] um único ciclo completo não gera padrão" time="0.000266164">
+        </testcase>
+        <testcase classname="tests/unit/insights.test.ts" name="insights pessoais &gt; [UT-INS-06] nenhum insight usa linguagem de diagnóstico e todos informam a base" time="0.001070615">
+        </testcase>
+        <testcase classname="tests/unit/insights.test.ts" name="regressão de texto &gt; [UT-INS-07] ciclos de mesma duração não geram texto &apos;entre 28 e 28 dias&apos;" time="0.000268429">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/unit/metrics.test.ts" timestamp="2026-11-11T23:38:56.436Z" hostname="vm" tests="19" failures="0" errors="0" skipped="0" time="0.022970176">
+        <testcase classname="tests/unit/metrics.test.ts" name="métricas do registro diário &gt; [UT-MET-01] codifica e decodifica sem perda (ida e volta)" time="0.003490525">
+        </testcase>
+        <testcase classname="tests/unit/metrics.test.ts" name="métricas do registro diário &gt; [UT-MET-02] mantém compatibilidade com registros antigos (só sintomas simples)" time="0.000248331">
+        </testcase>
+        <testcase classname="tests/unit/metrics.test.ts" name="métricas do registro diário &gt; [UT-MET-03] descarta valores desconhecidos, duplicados e fora de faixa" time="0.000427547">
+        </testcase>
+        <testcase classname="tests/unit/metrics.test.ts" name="métricas do registro diário &gt; [UT-MET-04] isValidMetric(cramps, 0) = true" time="0.000239653">
+        </testcase>
+        <testcase classname="tests/unit/metrics.test.ts" name="métricas do registro diário &gt; [UT-MET-04] isValidMetric(cramps, 3) = true" time="0.00009483">
+        </testcase>
+        <testcase classname="tests/unit/metrics.test.ts" name="métricas do registro diário &gt; [UT-MET-04] isValidMetric(cramps, 4) = false" time="0.000079413">
+        </testcase>
+        <testcase classname="tests/unit/metrics.test.ts" name="métricas do registro diário &gt; [UT-MET-04] isValidMetric(energy, 0) = false" time="0.000107072">
+        </testcase>
+        <testcase classname="tests/unit/metrics.test.ts" name="métricas do registro diário &gt; [UT-MET-04] isValidMetric(energy, 5) = true" time="0.000079483">
+        </testcase>
+        <testcase classname="tests/unit/metrics.test.ts" name="métricas do registro diário &gt; [UT-MET-04] isValidMetric(sleep_hours, 0) = true" time="0.000137495">
+        </testcase>
+        <testcase classname="tests/unit/metrics.test.ts" name="métricas do registro diário &gt; [UT-MET-04] isValidMetric(sleep_hours, 16) = true" time="0.000124068">
+        </testcase>
+        <testcase classname="tests/unit/metrics.test.ts" name="métricas do registro diário &gt; [UT-MET-04] isValidMetric(sleep_hours, 16.5) = false" time="0.000089285">
+        </testcase>
+        <testcase classname="tests/unit/metrics.test.ts" name="métricas do registro diário &gt; [UT-MET-04] isValidMetric(sleep_hours, 6.5) = true" time="0.000082422">
+        </testcase>
+        <testcase classname="tests/unit/metrics.test.ts" name="métricas do registro diário &gt; [UT-MET-04] isValidMetric(sleep_hours, NaN) = false" time="0.000073791">
+        </testcase>
+        <testcase classname="tests/unit/metrics.test.ts" name="métricas do registro diário &gt; [UT-MET-04] isValidMetric(unknown, 1) = false" time="0.000071717">
+        </testcase>
+        <testcase classname="tests/unit/metrics.test.ts" name="métricas do registro diário &gt; [UT-MET-05] encodeSymptoms ignora métricas inválidas e entradas vazias" time="0.000163013">
+        </testcase>
+        <testcase classname="tests/unit/metrics.test.ts" name="métricas do registro diário &gt; [UT-MET-06] sanitizeStoredSymptoms normaliza listas vindas do cliente" time="0.000178304">
+        </testcase>
+        <testcase classname="tests/unit/metrics.test.ts" name="métricas do registro diário &gt; [UT-MET-07] rótulos legíveis" time="0.01387889">
+        </testcase>
+        <testcase classname="tests/unit/metrics.test.ts" name="métricas do registro diário &gt; [UT-MET-08] hasAnyContent" time="0.000329518">
+        </testcase>
+        <testcase classname="tests/unit/metrics.test.ts" name="métricas do registro diário &gt; [UT-MET-09] tolera entrada nula ou com tipos inesperados" time="0.000152222">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/unit/reminders.test.ts" timestamp="2026-11-11T23:38:56.440Z" hostname="vm" tests="15" failures="0" errors="0" skipped="0" time="0.008980395">
+        <testcase classname="tests/unit/reminders.test.ts" name="lembretes &gt; [UT-REM-01] tudo desligado por padrão" time="0.002529112">
+        </testcase>
+        <testcase classname="tests/unit/reminders.test.ts" name="lembretes &gt; [UT-REM-02] dispara somente depois do horário configurado" time="0.000705035">
+        </testcase>
+        <testcase classname="tests/unit/reminders.test.ts" name="lembretes &gt; [UT-REM-03] às 20h: registro diário, previsão e lembrete personalizado do dia" time="0.000328133">
+        </testcase>
+        <testcase classname="tests/unit/reminders.test.ts" name="lembretes &gt; [UT-REM-04] não repete lembretes já disparados no dia" time="0.000153308">
+        </testcase>
+        <testcase classname="tests/unit/reminders.test.ts" name="lembretes &gt; [UT-REM-05] não lembra de registrar quem já registrou hoje" time="0.000874803">
+        </testcase>
+        <testcase classname="tests/unit/reminders.test.ts" name="lembretes &gt; [UT-REM-06] previsão fora da antecedência não dispara; previsão no dia dispara com texto próprio" time="0.000337875">
+        </testcase>
+        <testcase classname="tests/unit/reminders.test.ts" name="lembretes &gt; [UT-REM-07] sintomas só durante a menstruação" time="0.000182414">
+        </testcase>
+        <testcase classname="tests/unit/reminders.test.ts" name="lembretes &gt; [UT-REM-08] lembrete personalizado respeita o dia da semana" time="0.000128135">
+        </testcase>
+        <testcase classname="tests/unit/reminders.test.ts" name="lembretes &gt; [UT-REM-09] timeToMinutes(00:00) = 0" time="0.000203892">
+        </testcase>
+        <testcase classname="tests/unit/reminders.test.ts" name="lembretes &gt; [UT-REM-09] timeToMinutes(23:59) = 1439" time="0.00008342">
+        </testcase>
+        <testcase classname="tests/unit/reminders.test.ts" name="lembretes &gt; [UT-REM-09] timeToMinutes(24:00) = null" time="0.000074149">
+        </testcase>
+        <testcase classname="tests/unit/reminders.test.ts" name="lembretes &gt; [UT-REM-09] timeToMinutes(9:00) = null" time="0.000105494">
+        </testcase>
+        <testcase classname="tests/unit/reminders.test.ts" name="lembretes &gt; [UT-REM-09] timeToMinutes(aa:bb) = null" time="0.000079652">
+        </testcase>
+        <testcase classname="tests/unit/reminders.test.ts" name="lembretes &gt; [UT-REM-10] normaliza configurações corrompidas sem quebrar" time="0.000573243">
+        </testcase>
+        <testcase classname="tests/unit/reminders.test.ts" name="lembretes &gt; [UT-REM-11] limpeza das chaves antigas" time="0.000326565">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/unit/sound-messages-content.test.ts" timestamp="2026-11-11T23:38:56.442Z" hostname="vm" tests="15" failures="0" errors="0" skipped="0" time="0.010884208">
+        <testcase classname="tests/unit/sound-messages-content.test.ts" name="identidade sonora &gt; [UT-SND-01] sons vêm desligados por padrão (nada toca sem consentimento)" time="0.002711925">
+        </testcase>
+        <testcase classname="tests/unit/sound-messages-content.test.ts" name="identidade sonora &gt; [UT-SND-02] volume zero é silêncio; volume aplica proporcionalmente" time="0.000314594">
+        </testcase>
+        <testcase classname="tests/unit/sound-messages-content.test.ts" name="identidade sonora &gt; [UT-SND-03] volume é limitado a 0–1 e valores inválidos voltam ao padrão" time="0.00025733">
+        </testcase>
+        <testcase classname="tests/unit/sound-messages-content.test.ts" name="identidade sonora &gt; [UT-SND-04] todos os eventos têm notas audíveis e curtas (&lt; 1 s)" time="0.000519259">
+        </testcase>
+        <testcase classname="tests/unit/sound-messages-content.test.ts" name="mensagens contextuais &gt; [UT-MSG-01] sem registros convida a registrar" time="0.000548816">
+        </testcase>
+        <testcase classname="tests/unit/sound-messages-content.test.ts" name="mensagens contextuais &gt; [UT-MSG-02] durante a menstruação" time="0.000315949">
+        </testcase>
+        <testcase classname="tests/unit/sound-messages-content.test.ts" name="mensagens contextuais &gt; [UT-MSG-03] previsão próxima é apresentada como estimativa" time="0.000302853">
+        </testcase>
+        <testcase classname="tests/unit/sound-messages-content.test.ts" name="mensagens contextuais &gt; [UT-MSG-04] previsão vencida fala de variação, sem alarmismo" time="0.000282419">
+        </testcase>
+        <testcase classname="tests/unit/sound-messages-content.test.ts" name="mensagens contextuais &gt; [UT-MSG-05] janela fértil lembra que não é contraceptivo" time="0.000151293">
+        </testcase>
+        <testcase classname="tests/unit/sound-messages-content.test.ts" name="central de informações &gt; [UT-CNT-01] todos os artigos têm categoria válida, seções e ids únicos" time="0.001197472">
+        </testcase>
+        <testcase classname="tests/unit/sound-messages-content.test.ts" name="central de informações &gt; [UT-CNT-02] linguagem responsável: não promete diagnóstico nem contracepção" time="0.000417033">
+        </testcase>
+        <testcase classname="tests/unit/sound-messages-content.test.ts" name="central de informações &gt; [UT-CNT-03] filtro por categoria" time="0.000588919">
+        </testcase>
+        <testcase classname="tests/unit/sound-messages-content.test.ts" name="preferências do aparelho &gt; [UT-DEV-01] padrões seguros: sons e lembretes desligados, tema do sistema" time="0.000171665">
+        </testcase>
+        <testcase classname="tests/unit/sound-messages-content.test.ts" name="preferências do aparelho &gt; [UT-DEV-02] normaliza armazenamento corrompido" time="0.000551414">
+        </testcase>
+        <testcase classname="tests/unit/sound-messages-content.test.ts" name="preferências do aparelho &gt; [UT-DEV-03] tema resolvido a partir do sistema" time="0.000221134">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/unit/statistics.test.ts" timestamp="2026-11-11T23:38:56.444Z" hostname="vm" tests="18" failures="0" errors="0" skipped="0" time="0.030835253">
+        <testcase classname="tests/unit/statistics.test.ts" name="summarize (estatística descritiva) &gt; [UT-STA-01] lista vazia não inventa valores" time="0.005208753">
+        </testcase>
+        <testcase classname="tests/unit/statistics.test.ts" name="summarize (estatística descritiva) &gt; [UT-STA-02] um único valor tem desvio zero" time="0.00114827">
+        </testcase>
+        <testcase classname="tests/unit/statistics.test.ts" name="summarize (estatística descritiva) &gt; [UT-STA-03] mediana com quantidade par e desvio-padrão amostral" time="0.000476702">
+        </testcase>
+        <testcase classname="tests/unit/statistics.test.ts" name="summarize (estatística descritiva) &gt; [UT-STA-04] ignora valores não finitos" time="0.000179961">
+        </testcase>
+        <testcase classname="tests/unit/statistics.test.ts" name="resumo por ciclo &gt; [UT-STA-05] ciclos regulares: duração, menstruação e ciclo atual em andamento" time="0.01418482">
+        </testcase>
+        <testcase classname="tests/unit/statistics.test.ts" name="resumo por ciclo &gt; [UT-STA-06] sinaliza ciclos fora da faixa de referência, com motivo descritivo" time="0.000468567">
+        </testcase>
+        <testcase classname="tests/unit/statistics.test.ts" name="resumo por ciclo &gt; [UT-STA-07] sinaliza sangramento maior que 8 dias" time="0.000192592">
+        </testcase>
+        <testcase classname="tests/unit/statistics.test.ts" name="resumo por ciclo &gt; [UT-STA-08] agrega sintomas e humor dentro de cada ciclo" time="0.00116077">
+        </testcase>
+        <testcase classname="tests/unit/statistics.test.ts" name="frequências e séries &gt; [UT-STA-09] frequência de sintomas ordenada e com percentual sobre dias registrados" time="0.000494734">
+        </testcase>
+        <testcase classname="tests/unit/statistics.test.ts" name="frequências e séries &gt; [UT-STA-10] sem registros → frequência vazia" time="0.000209018">
+        </testcase>
+        <testcase classname="tests/unit/statistics.test.ts" name="frequências e séries &gt; [UT-STA-11] série de humor ignora dias sem humor reconhecido" time="0.000458091">
+        </testcase>
+        <testcase classname="tests/unit/statistics.test.ts" name="frequências e séries &gt; [UT-STA-12] frequência de humores" time="0.000366035">
+        </testcase>
+        <testcase classname="tests/unit/statistics.test.ts" name="frequências e séries &gt; [UT-STA-13] séries e médias de métricas" time="0.000735613">
+        </testcase>
+        <testcase classname="tests/unit/statistics.test.ts" name="filtros e relatório por período &gt; [UT-STA-14] início de cada período" time="0.00026274">
+        </testcase>
+        <testcase classname="tests/unit/statistics.test.ts" name="filtros e relatório por período &gt; [UT-STA-15] filtro por data inclui as bordas" time="0.000275557">
+        </testcase>
+        <testcase classname="tests/unit/statistics.test.ts" name="filtros e relatório por período &gt; [UT-STA-16] relatório usa apenas registros do período" time="0.001770365">
+        </testcase>
+        <testcase classname="tests/unit/statistics.test.ts" name="filtros e relatório por período &gt; [UT-STA-17] relatório vazio sem dados não inventa números" time="0.000311117">
+        </testcase>
+        <testcase classname="tests/unit/statistics.test.ts" name="filtros e relatório por período &gt; [UT-STA-18] sequência de dias registrados" time="0.000328133">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/unit/validation.test.ts" timestamp="2026-11-11T23:38:56.447Z" hostname="vm" tests="11" failures="0" errors="0" skipped="0" time="0.011092211">
+        <testcase classname="tests/unit/validation.test.ts" name="validação de formulários &gt; [UT-VAL-01] registro diário válido normaliza observações vazias para null" time="0.003804245">
+        </testcase>
+        <testcase classname="tests/unit/validation.test.ts" name="validação de formulários &gt; [UT-VAL-02] registro diário rejeita data e fluxo inválidos" time="0.000626163">
+        </testcase>
+        <testcase classname="tests/unit/validation.test.ts" name="validação de formulários &gt; [UT-VAL-03] observações: 2000 caracteres aceitos, 2001 rejeitados" time="0.000653206">
+        </testcase>
+        <testcase classname="tests/unit/validation.test.ts" name="validação de formulários &gt; [UT-VAL-04] humor: valores fora do catálogo e intensidade fora de 1–5 são rejeitados" time="0.001114097">
+        </testcase>
+        <testcase classname="tests/unit/validation.test.ts" name="validação de formulários &gt; [UT-VAL-05] ciclo: fim antes do início é rejeitado" time="0.000446189">
+        </testcase>
+        <testcase classname="tests/unit/validation.test.ts" name="validação de formulários &gt; [UT-VAL-06] preferências de ciclo: limites 15/90 e 1/15" time="0.000370896">
+        </testcase>
+        <testcase classname="tests/unit/validation.test.ts" name="validação de formulários &gt; [UT-VAL-07] credenciais: e-mail inválido e senha curta" time="0.000651873">
+        </testcase>
+        <testcase classname="tests/unit/validation.test.ts" name="validação de formulários &gt; [UT-VAL-08] troca de senha exige letras, números e confirmação igual" time="0.000345474">
+        </testcase>
+        <testcase classname="tests/unit/validation.test.ts" name="validação de formulários &gt; [UT-VAL-09] perfil: nome vazio vira null; nome longo é rejeitado" time="0.000219855">
+        </testcase>
+        <testcase classname="tests/unit/validation.test.ts" name="validação de formulários &gt; [UT-VAL-10] lembrete personalizado: horário, título e dias" time="0.000656923">
+        </testcase>
+        <testcase classname="tests/unit/validation.test.ts" name="validação de formulários &gt; [UT-VAL-11] parseOptionalInt" time="0.000243107">
+        </testcase>
+    </testsuite>
+</testsuites>
