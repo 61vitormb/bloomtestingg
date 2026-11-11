@@ -1,196 +1,419 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
-import { Plus } from "lucide-react";
-import { DayLogSheet } from "@/components/bloom/DayLogSheet";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo } from "react";
+import { ArrowRight, CalendarHeart, EyeOff, Sparkles } from "lucide-react";
+import { CycleRing } from "@/components/bloom/CycleRing";
+import { DayFlower, type FlowerSection } from "@/components/bloom/DayFlower";
+import { ErrorState, LoadingBloom } from "@/components/bloom/Feedback";
+import { useLogSheet } from "@/components/bloom/LogSheetContext";
+import { DayCell, WEEKDAY_LETTERS } from "@/components/bloom/MiniMonth";
+import { MoodShape } from "@/components/bloom/MoodShape";
 import { PHASE_INFO, moodLabel } from "@/domain/catalog";
-import {
-  addDays,
-  buildCycleOverview,
-  diffInDays,
-  estimatedFertileWindow,
-  parseISODate,
-  type CycleRecord,
-} from "@/domain/cycle";
-import { formatShort, todayISO } from "@/lib/format";
-import { useCycles, useDailyLogs, useMoodLogs, usePreferences } from "@/hooks/useBloomData";
+import { addDays, startOfWeekISO } from "@/domain/cycle";
+import { generateInsights } from "@/domain/insights";
+import { contextualMessage } from "@/domain/messages";
+import { decodeSymptoms } from "@/domain/metrics";
+import { filterByDate, symptomFrequency } from "@/domain/statistics";
+import { useCycleModel, useProfile } from "@/hooks/useBloomData";
+import { useDeviceSettings } from "@/lib/device-settings";
+import { formatShort, formatWeekdayLong, greetingForNow, relativeDaysLabel } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/app/")({
   head: () => ({
     meta: [
-      { title: "Home — Bloom" },
-      { name: "description", content: "Resumo do seu ciclo e registro rápido do dia." },
-      { property: "og:title", content: "Home — Bloom" },
-      { property: "og:description", content: "Resumo do ciclo e registro rápido do dia." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { title: "Seu ciclo — Bloom" },
+      {
+        name: "description",
+        content: "Resumo do seu ciclo, previsões estimadas e registro rápido do dia.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
   component: HomeScreen,
 });
 
-const WEEK_LETTERS = ["D", "S", "T", "Q", "Q", "S", "S"];
+const CONFIDENCE_LABEL = {
+  none: "baseada no padrão informado",
+  low: "pouca precisão (1 ciclo)",
+  medium: "precisão moderada",
+  high: "boa base de registros",
+} as const;
 
 function HomeScreen() {
   const navigate = useNavigate();
-  const today = todayISO();
-  const preferences = usePreferences();
-  const cycles = useCycles();
-  const dailyLogs = useDailyLogs();
-  const moodLogs = useMoodLogs();
-  const [sheetDate, setSheetDate] = useState<string | null>(null);
+  const { openLog } = useLogSheet();
+  const profile = useProfile();
+  const device = useDeviceSettings();
+  const model = useCycleModel();
+  const { today, overview, preferences, dailyLogs, moodLogs } = model;
+  const discreet = device.discreet;
 
   useEffect(() => {
-    if (preferences.data?.onboarding_completed === false) navigate({ to: "/onboarding", replace: true });
-  }, [preferences.data, navigate]);
+    if (preferences.data?.onboarding_completed === false && !preferences.isFetching) {
+      navigate({ to: "/onboarding", replace: true });
+    }
+  }, [preferences.data, preferences.isFetching, navigate]);
 
-  const cycleRecords: CycleRecord[] = useMemo(
-    () => (cycles.data ?? []).map(({ id, start_date, end_date }) => ({ id, start_date, end_date })),
-    [cycles.data],
-  );
-  const declared = {
-    cycleLength: preferences.data?.average_cycle_length ?? null,
-    periodLength: preferences.data?.average_period_length ?? null,
+  const todayDaily = dailyLogs.data?.find((l) => l.log_date === today) ?? null;
+  const todayMood = moodLogs.data?.find((l) => l.log_date === today) ?? null;
+  const decodedToday = decodeSymptoms(todayDaily?.symptoms);
+  const filled: Partial<Record<FlowerSection, boolean>> = {
+    flow: Boolean(todayDaily?.flow_intensity) || model.recorded.has(today),
+    mood: Boolean(todayMood?.moods.length),
+    symptoms:
+      decodedToday.physical.length + decodedToday.emotional.length > 0 ||
+      decodedToday.metrics.cramps !== undefined ||
+      decodedToday.metrics.pain !== undefined,
+    energy: decodedToday.metrics.energy !== undefined,
+    sleep:
+      decodedToday.metrics.sleep_quality !== undefined ||
+      decodedToday.metrics.sleep_hours !== undefined,
+    notes: Boolean(todayDaily?.notes),
   };
-  const overview = useMemo(
-    () => buildCycleOverview(cycleRecords, today, declared),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [cycleRecords, today, preferences.data],
+  const loggedToday = Boolean(todayDaily || todayMood);
+
+  const logged = useMemo(
+    () => new Set([...(dailyLogs.data ?? []), ...(moodLogs.data ?? [])].map((l) => l.log_date)),
+    [dailyLogs.data, moodLogs.data],
   );
-  const fertile = useMemo(
-    () => estimatedFertileWindow(cycleRecords, declared.cycleLength),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [cycleRecords, preferences.data],
+  const marks = {
+    recorded: model.recorded,
+    predicted: model.predicted,
+    fertile: model.fertile,
+    ovulation: model.ovulation,
+    logged,
+  };
+
+  const recentMoods = useMemo(
+    () =>
+      (moodLogs.data ?? [])
+        .filter((m) => m.moods.length && m.log_date >= addDays(today, -6) && m.log_date <= today)
+        .slice(0, 7),
+    [moodLogs.data, today],
+  );
+  const topSymptoms = useMemo(
+    () =>
+      symptomFrequency(filterByDate(dailyLogs.data ?? [], addDays(today, -90), today)).slice(0, 4),
+    [dailyLogs.data, today],
+  );
+  const insight = useMemo(
+    () => generateInsights(model.records, dailyLogs.data ?? [], moodLogs.data ?? [])[0] ?? null,
+    [model.records, dailyLogs.data, moodLogs.data],
   );
 
-  const weekStart = addDays(today, -parseISODate(today).getDay());
-  const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+  if (model.isLoading)
+    return <LoadingBloom label="Preparando seu ciclo…" className="min-h-[60vh]" />;
+  if (model.isError) return <ErrorState onRetry={() => void model.refetch()} />;
+
+  const message = contextualMessage(overview, loggedToday);
   const phase = overview.phase ? PHASE_INFO[overview.phase] : null;
-  const todayMood = moodLogs.data?.find((log) => log.log_date === today);
-  const hasTodayData = Boolean(dailyLogs.data?.some((l) => l.log_date === today) || todayMood);
-
+  const days = overview.daysUntilNextPeriod;
   const inPeriod = overview.phase === "menstrual";
-  const daysUntil = overview.daysUntilNextPeriod;
-  const ringRatio =
-    overview.dayOfCycle === null
-      ? 0
-      : Math.min(1, Math.max(0.03, overview.dayOfCycle / Math.max(overview.cycleLength.value, 1)));
+  const weekStart = startOfWeekISO(today);
+  const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 
-  let bigNumber = "—";
-  let ringLabel = "Registre sua menstruação";
-  if (inPeriod && overview.dayOfCycle !== null) {
-    bigNumber = String(overview.dayOfCycle);
-    ringLabel = "Menstruação · dia";
-  } else if (daysUntil !== null && daysUntil >= 0) {
-    bigNumber = String(daysUntil);
-    ringLabel = daysUntil === 1 ? "dia para a próxima menstruação" : "dias para a próxima menstruação";
-  } else if (overview.dayOfCycle !== null) {
-    bigNumber = String(overview.dayOfCycle);
-    ringLabel = "Dia do ciclo";
-  }
+  let headline: string;
+  if (overview.lastPeriodStart === null) headline = "Registre sua menstruação";
+  else if (discreet) headline = "Ciclo em andamento";
+  else if (inPeriod) headline = `Menstruação · dia ${overview.dayOfCycle}`;
+  else if (days !== null && days > 1) headline = `${days} dias até a próxima menstruação`;
+  else if (days === 1) headline = "Menstruação prevista para amanhã";
+  else if (days === 0) headline = "Menstruação prevista para hoje";
+  else if (days !== null)
+    headline = `Menstruação ${Math.abs(days)} ${Math.abs(days) === 1 ? "dia" : "dias"} após a estimativa`;
+  else headline = `Dia ${overview.dayOfCycle} do ciclo`;
 
-  const fertileLabel = !fertile
-    ? "—"
-    : diffInDays(today, fertile.end) < 0
-      ? "Passou"
-      : formatShort(fertile.start);
-
-  const size = 200;
-  const r = 92;
-  const c = 2 * Math.PI * r;
+  const name = profile.data?.display_name;
 
   return (
-    <div className="flex h-full min-h-0 flex-col overflow-hidden">
-      <h1 className="sr-only">Home</h1>
+    <div className="space-y-6">
+      <header className="flex flex-wrap items-end justify-between gap-3 animate-fade-up">
+        <div>
+          <p className="eyebrow first-letter:uppercase">{formatWeekdayLong(today)}</p>
+          <h1 className="mt-1 text-[1.75rem] leading-tight font-bold tracking-tight md:text-3xl">
+            {greetingForNow(name)}
+          </h1>
+        </div>
+        {discreet ? (
+          <Link
+            to="/app/ajustes"
+            className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1.5 text-xs font-medium text-muted-foreground"
+          >
+            <EyeOff className="size-3.5" aria-hidden="true" /> Modo discreto ativo
+          </Link>
+        ) : null}
+      </header>
 
-      <section aria-label="Esta semana" className="pt-1">
-        <ul className="grid grid-cols-7 gap-1.5">
-          {weekDays.map((day, i) => {
-            const active = day === today;
-            const hasData =
-              dailyLogs.data?.some((l) => l.log_date === day) || moodLogs.data?.some((l) => l.log_date === day);
-            return (
-              <li key={day}>
-                <button
-                  type="button"
-                  aria-label={`Registrar ${formatShort(day)}`}
-                  aria-current={active ? "date" : undefined}
-                  onClick={() => setSheetDate(day)}
-                  className={cn(
-                    "press flex h-16 w-full flex-col items-center justify-center rounded-2xl border bg-secondary transition-colors",
-                    active ? "border-2 border-neon bg-background" : "border-transparent",
-                  )}
-                >
-                  <span className="text-[11px] font-medium text-muted-foreground">{WEEK_LETTERS[i]}</span>
-                  <span className="text-base font-bold">{Number(day.slice(-2))}</span>
-                  <span className={cn("mt-0.5 size-1.5 rounded-full", hasData ? "bg-neon" : "bg-transparent")} aria-hidden="true" />
-                </button>
-              </li>
-            );
-          })}
+      {/* Faixa da semana */}
+      <section aria-label="Esta semana" className="bloom-card p-3 animate-fade-up">
+        <ul className="grid grid-cols-7 gap-1">
+          {weekDays.map((day, i) => (
+            <li key={day} className="flex flex-col items-center gap-1.5">
+              <span
+                className={cn(
+                  "text-[11px] font-semibold",
+                  day === today ? "text-primary" : "text-muted-foreground",
+                )}
+              >
+                {day === today ? "Hoje" : WEEKDAY_LETTERS[i]}
+              </span>
+              <DayCell
+                iso={day}
+                marks={
+                  discreet
+                    ? {
+                        ...marks,
+                        recorded: new Set(),
+                        predicted: new Set(),
+                        fertile: new Set(),
+                        ovulation: new Set(),
+                      }
+                    : marks
+                }
+                today={today}
+                onSelect={(d) => openLog(d)}
+                size="md"
+              />
+            </li>
+          ))}
         </ul>
       </section>
 
-      <section aria-label="Status do ciclo" className="flex min-h-0 flex-1 items-center justify-center py-3">
-        <div
-          role="img"
-          aria-label={`${bigNumber} ${ringLabel}${phase ? `. Fase estimada ${phase.label}` : ""}`}
-          className="relative aspect-square h-full max-h-[260px] max-w-full"
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+        {/* Anel do ciclo */}
+        <section
+          aria-labelledby="ring-title"
+          className="bloom-card relative overflow-hidden p-5 md:p-8 animate-scale-in"
         >
-          <svg viewBox={`0 0 ${size} ${size}`} className="absolute inset-0 size-full -rotate-90" aria-hidden="true">
-            <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--border)" strokeWidth="4" />
-            <circle
-              cx={size / 2}
-              cy={size / 2}
-              r={r}
-              fill="none"
-              stroke="var(--neon)"
-              strokeWidth="5"
-              strokeLinecap="round"
-              strokeDasharray={c}
-              strokeDashoffset={c * (1 - ringRatio)}
-              className="transition-[stroke-dashoffset] duration-700 ease-out"
-            />
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center px-10 text-center">
-            <span className="text-6xl leading-none font-bold">{bigNumber}</span>
-            <span className="mt-2 text-sm text-muted-foreground">{ringLabel}</span>
+          <div className="dawn grain absolute inset-0 opacity-90" aria-hidden="true" />
+          <div className="relative">
+            <h2 id="ring-title" className="sr-only">
+              Seu ciclo atual
+            </h2>
+            <CycleRing
+              cycleStart={overview.lastPeriodStart}
+              cycleLength={overview.cycleLength.value}
+              today={today}
+              dayOfCycle={overview.dayOfCycle}
+              recorded={model.recorded}
+              predicted={model.predicted}
+              fertile={model.fertile}
+              ovulation={model.ovulation}
+              loggedDays={logged}
+              discreet={discreet}
+              label={`${headline}${phase && !discreet ? `. Fase estimada: ${phase.label}` : ""}`}
+            >
+              <p className="text-xs font-semibold text-muted-foreground">
+                Hoje, {formatShort(today)}
+              </p>
+              <p className="mt-1 text-xl leading-tight font-bold tracking-tight text-balance sm:text-2xl">
+                {headline}
+              </p>
+              {phase && !discreet ? (
+                <span
+                  className="mt-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold whitespace-nowrap"
+                  style={{ background: phase.soft, color: phase.color }}
+                >
+                  <span
+                    className="size-1.5 rounded-full"
+                    style={{ background: phase.color }}
+                    aria-hidden="true"
+                  />
+                  Fase {phase.label.toLowerCase()} · estimada
+                </span>
+              ) : null}
+            </CycleRing>
+
+            {overview.lastPeriodStart === null ? (
+              <button
+                type="button"
+                onClick={() => openLog(today, "flow")}
+                className="press mx-auto mt-4 flex min-h-12 items-center gap-2 rounded-full bg-ink px-5 font-semibold text-ink-foreground"
+              >
+                <CalendarHeart className="size-5" aria-hidden="true" /> Registrar menstruação
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => openLog(today, "mood")}
+                className="press mt-4 flex w-full items-center gap-3 rounded-2xl bg-accent/70 px-4 py-3 text-left"
+              >
+                <span
+                  className="flex size-9 items-center justify-center rounded-full"
+                  style={{ background: "var(--petal-amber)" }}
+                  aria-hidden="true"
+                >
+                  <Sparkles className="size-4 text-white" />
+                </span>
+                <span className="flex-1 font-semibold">Como você se sente hoje?</span>
+                <ArrowRight className="size-5 text-primary" aria-hidden="true" />
+              </button>
+            )}
           </div>
+        </section>
+
+        <div className="space-y-6">
+          {/* Mensagem contextual */}
+          <section className="bloom-gradient grain overflow-hidden rounded-[1.75rem] p-5 text-white shadow-[var(--shadow-lift)] animate-fade-up">
+            <div className="relative z-10">
+              <p className="text-xs font-semibold tracking-wide text-white/80 uppercase">
+                Para você hoje
+              </p>
+              <h2 className="mt-1 text-lg leading-snug font-bold">{message.title}</h2>
+              <p className="mt-1 text-sm text-white/90">{message.body}</p>
+            </div>
+          </section>
+
+          {/* Próxima menstruação */}
+          {!discreet ? (
+            <section className="grid grid-cols-2 gap-3 stagger" aria-label="Previsões">
+              <div className="bloom-card p-4">
+                <p className="eyebrow">Próxima menstruação</p>
+                <p className="mt-2 text-xl font-bold">
+                  {overview.nextPeriod ? formatShort(overview.nextPeriod.date) : "—"}
+                </p>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  {overview.nextPeriod && days !== null
+                    ? `${relativeDaysLabel(days)} · estimativa`
+                    : "Sem dados suficientes"}
+                </p>
+              </div>
+              <div className="bloom-card p-4">
+                <p className="eyebrow">Ciclo médio</p>
+                <p className="mt-2 text-xl font-bold tabular-nums">
+                  {overview.cycleLength.value}
+                  <span className="ml-1 text-sm font-medium text-muted-foreground">dias</span>
+                </p>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  {CONFIDENCE_LABEL[overview.cycleLength.confidence]}
+                </p>
+              </div>
+            </section>
+          ) : null}
+
+          {/* Flor do dia */}
+          <section aria-labelledby="flower-title" className="bloom-card p-5">
+            <div className="flex items-center justify-between">
+              <h2 id="flower-title" className="font-bold">
+                Seu dia
+              </h2>
+              <span className="text-xs text-muted-foreground">
+                {Object.values(filled).filter(Boolean).length} de 6 registrados
+              </span>
+            </div>
+            <DayFlower
+              filled={filled}
+              onSelect={(s) => openLog(today, s)}
+              className="mt-2 max-w-[240px]"
+            />
+            <p className="text-center text-xs text-muted-foreground">
+              Toque em uma pétala para registrar.
+            </p>
+          </section>
         </div>
-      </section>
-
-      <ul aria-label="Resumo rápido" className="grid grid-cols-3 gap-2">
-        <SummaryChip label="Humor" value={todayMood?.moods[0] ? moodLabel(todayMood.moods[0]) : "—"} />
-        <SummaryChip label="Fase" value={phase?.label ?? "—"} />
-        <SummaryChip label="Janela fértil" value={fertileLabel} />
-      </ul>
-
-      <div className="flex flex-col items-center py-4">
-        <button
-          type="button"
-          onClick={() => setSheetDate(today)}
-          aria-label={hasTodayData ? "Editar informações de hoje" : "Adicionar informações de hoje"}
-          className="press flex size-16 items-center justify-center rounded-full bg-primary text-primary-foreground ring-4 ring-neon/30 transition-transform"
-        >
-          <Plus className="size-7" aria-hidden="true" />
-        </button>
-        <span className="mt-1.5 text-xs font-medium">{hasTodayData ? "Editar hoje" : "Adicionar"}</span>
       </div>
 
-      <p className="pb-1 text-center text-[10px] leading-tight text-muted-foreground">
-        Previsões são estimativas e não substituem orientação de saúde.
-      </p>
-      <DayLogSheet date={sheetDate} open={sheetDate !== null} onOpenChange={(open) => setSheetDate(open ? sheetDate : null)} />
-    </div>
-  );
-}
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <section aria-labelledby="moods-title" className="bloom-card p-5">
+          <div className="flex items-center justify-between">
+            <h2 id="moods-title" className="font-bold">
+              Humor recente
+            </h2>
+            <Link to="/app/humor" className="text-xs font-semibold text-primary">
+              Ver tudo
+            </Link>
+          </div>
+          {recentMoods.length ? (
+            <ul className="mt-4 flex flex-wrap gap-3">
+              {recentMoods.map((m) => (
+                <li key={m.log_date} className="flex flex-col items-center gap-1 text-center">
+                  <MoodShape mood={m.moods[0]!} size={40} />
+                  <span className="text-[11px] font-medium">{moodLabel(m.moods[0]!)}</span>
+                  <span className="text-[10px] text-muted-foreground">
+                    {formatShort(m.log_date)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-3 text-sm text-muted-foreground">
+              Nenhum humor registrado nos últimos 7 dias.
+            </p>
+          )}
+        </section>
 
-function SummaryChip({ label, value }: { label: string; value: string }) {
-  return (
-    <li className="flex min-h-14 flex-col items-center justify-center rounded-full bg-secondary px-2 text-center">
-      <span className="text-[10px] font-medium text-muted-foreground uppercase">{label}</span>
-      <span className="truncate text-sm font-bold capitalize">{value}</span>
-    </li>
+        <section aria-labelledby="symptoms-title" className="bloom-card p-5">
+          <div className="flex items-center justify-between">
+            <h2 id="symptoms-title" className="font-bold">
+              Sintomas mais frequentes
+            </h2>
+            <span className="text-xs text-muted-foreground">90 dias</span>
+          </div>
+          {topSymptoms.length ? (
+            <ul className="mt-4 space-y-3">
+              {topSymptoms.map((s, i) => (
+                <li key={s.value}>
+                  <div className="flex justify-between text-sm">
+                    <span className="font-medium">{s.label}</span>
+                    <span className="text-muted-foreground tabular-nums">{s.count}×</span>
+                  </div>
+                  <div className="mt-1 h-2 overflow-hidden rounded-full bg-muted">
+                    <div
+                      className="h-full rounded-full transition-[width] duration-700"
+                      style={{
+                        width: `${(s.count / topSymptoms[0]!.count) * 100}%`,
+                        background: [
+                          "var(--petal-coral)",
+                          "var(--petal-rose)",
+                          "var(--petal-lilac)",
+                          "var(--petal-teal)",
+                        ][i],
+                      }}
+                    />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-3 text-sm text-muted-foreground">
+              Seus sintomas aparecerão aqui conforme você registrar.
+            </p>
+          )}
+        </section>
+
+        <section
+          aria-labelledby="insight-title"
+          className="bloom-card flex flex-col p-5 md:col-span-2 xl:col-span-1"
+        >
+          <h2 id="insight-title" className="font-bold">
+            Insight pessoal
+          </h2>
+          {insight ? (
+            <>
+              <p className="mt-3 font-semibold">{insight.title}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{insight.body}</p>
+              <p className="mt-2 text-[11px] text-muted-foreground">
+                Baseado em {insight.basedOn}. Descritivo, não é diagnóstico.
+              </p>
+            </>
+          ) : (
+            <p className="mt-3 text-sm text-muted-foreground">
+              Registre pelo menos dois ciclos para ver padrões descritivos dos seus dados.
+            </p>
+          )}
+          <Link
+            to="/app/analise"
+            className="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-semibold text-primary"
+          >
+            Ver análise completa <ArrowRight className="size-4" aria-hidden="true" />
+          </Link>
+        </section>
+      </div>
+
+      <p className="text-center text-[11px] leading-relaxed text-muted-foreground">
+        Previsões são estimativas calculadas a partir dos seus registros. O Bloom não é método
+        contraceptivo nem ferramenta de diagnóstico.
+      </p>
+    </div>
   );
 }

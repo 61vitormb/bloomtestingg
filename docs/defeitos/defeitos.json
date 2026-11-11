@@ -1,0 +1,388 @@
+[
+  {
+    "id": "DEF-001",
+    "descricao": "Datas exibidas um dia antes do correto (ex.: 11/11 aparecia como '10 de nov') em fusos negativos como America/Sao_Paulo.",
+    "modulo": "Formatação de datas (todas as telas)",
+    "passos": [
+      "Configurar o aparelho no fuso de Brasília",
+      "Registrar algo em 11/11",
+      "Ver a data no calendário ou histórico"
+    ],
+    "esperado": "Exibir '11 de nov'",
+    "obtido": "Exibia '10 de nov' (data ISO interpretada como meia-noite UTC e formatada no fuso local)",
+    "severidade": "Alta",
+    "prioridade": "Alta",
+    "status": "Corrigido",
+    "responsavel": "A preencher pela equipe",
+    "identificado_por": "Auditoria de código (Fase 1)",
+    "evidencias": [
+      "UT-FMT-01",
+      "UT-FMT-02",
+      "UT-CYC-30"
+    ],
+    "correcao": "parseISODate passou a usar meio-dia UTC; formatação usa Date local (isoToLocalDate). src/domain/cycle.ts, src/lib/format.ts"
+  },
+  {
+    "id": "DEF-002",
+    "descricao": "Cabeçalho do calendário mostrava o mês anterior ('outubro de 2026' em novembro).",
+    "modulo": "Calendário",
+    "passos": [
+      "Abrir o Calendário em novembro no fuso de Brasília"
+    ],
+    "esperado": "'novembro de 2026'",
+    "obtido": "'outubro de 2026'",
+    "severidade": "Alta",
+    "prioridade": "Alta",
+    "status": "Corrigido",
+    "responsavel": "A preencher pela equipe",
+    "identificado_por": "Auditoria de código (Fase 1)",
+    "evidencias": [
+      "UT-FMT-03",
+      "E2E-01 passo 7"
+    ],
+    "correcao": "formatMonthYear usa new Date(ano, mês, 1, 12) local. src/lib/format.ts"
+  },
+  {
+    "id": "DEF-003",
+    "descricao": "Faixa semanal da Home deslocada em um dia (semana começava no sábado).",
+    "modulo": "Dashboard",
+    "passos": [
+      "Abrir a Home numa quarta-feira no fuso de Brasília"
+    ],
+    "esperado": "Semana de domingo a sábado contendo hoje na posição correta",
+    "obtido": "getDay() local sobre data UTC devolvia o dia anterior",
+    "severidade": "Média",
+    "prioridade": "Alta",
+    "status": "Corrigido",
+    "responsavel": "A preencher pela equipe",
+    "identificado_por": "Auditoria de código (Fase 1)",
+    "evidencias": [
+      "UT-CYC-31"
+    ],
+    "correcao": "weekdayOf/startOfWeekISO independentes de fuso. src/domain/cycle.ts"
+  },
+  {
+    "id": "DEF-004",
+    "descricao": "Desmarcar todos os humores de um dia não apagava o registro de humor anterior.",
+    "modulo": "Registro diário / Humor",
+    "passos": [
+      "Registrar 'Feliz' hoje",
+      "Abrir o registro, desmarcar 'Feliz' e salvar"
+    ],
+    "esperado": "Dia sem humor registrado",
+    "obtido": "O humor antigo continuava salvo",
+    "severidade": "Média",
+    "prioridade": "Média",
+    "status": "Corrigido",
+    "responsavel": "A preencher pela equipe",
+    "identificado_por": "Auditoria de código (Fase 1)",
+    "evidencias": [
+      "IT-DB-05",
+      "AT-07"
+    ],
+    "correcao": "upsertMoodLog exclui o registro quando fica vazio. src/services/bloom.ts"
+  },
+  {
+    "id": "DEF-005",
+    "descricao": "Salvar o formulário diário vazio criava linhas vazias no banco, contadas como 'dia registrado'.",
+    "modulo": "Registro diário",
+    "passos": [
+      "Abrir o registro de um dia",
+      "Clicar em Salvar sem preencher nada"
+    ],
+    "esperado": "Nada é gravado",
+    "obtido": "Linha vazia em daily_logs",
+    "severidade": "Baixa",
+    "prioridade": "Média",
+    "status": "Corrigido",
+    "responsavel": "A preencher pela equipe",
+    "identificado_por": "Auditoria de código (Fase 1)",
+    "evidencias": [
+      "IT-DB-04"
+    ],
+    "correcao": "upsertDailyLog remove o registro quando vazio. src/services/bloom.ts"
+  },
+  {
+    "id": "DEF-006",
+    "descricao": "Itens de Ajustes sem funcionalidade ('Planos & Assinatura', 'Tema: Monocromático').",
+    "modulo": "Perfil e configurações",
+    "passos": [
+      "Abrir Ajustes",
+      "Tocar em 'Planos & Assinatura' ou 'Tema'"
+    ],
+    "esperado": "Ação funcional ou item ausente",
+    "obtido": "Nada acontecia (viola regra 'sem botões sem funcionalidade')",
+    "severidade": "Baixa",
+    "prioridade": "Média",
+    "status": "Corrigido",
+    "responsavel": "A preencher pela equipe",
+    "identificado_por": "Auditoria de UI (Fase 1)",
+    "evidencias": [
+      "E2E-12"
+    ],
+    "correcao": "Planos removido; Tema virou seletor funcional Sistema/Claro/Escuro. src/routes/_authenticated/app.ajustes.tsx"
+  },
+  {
+    "id": "DEF-007",
+    "descricao": "Ausência de exclusão da conta, troca de senha e gerenciamento de sessões (requisitos LGPD/edital).",
+    "modulo": "Perfil e configurações",
+    "passos": [
+      "Procurar essas opções em Ajustes"
+    ],
+    "esperado": "Funções disponíveis",
+    "obtido": "Inexistentes",
+    "severidade": "Alta",
+    "prioridade": "Alta",
+    "status": "Corrigido",
+    "responsavel": "A preencher pela equipe",
+    "identificado_por": "Auditoria de requisitos (Fase 1)",
+    "evidencias": [
+      "IT-DEL-02",
+      "IT-CFG-03",
+      "IT-CFG-04",
+      "E2E-10",
+      "E2E-11"
+    ],
+    "correcao": "Função de servidor deleteMyAccount, changePassword, signOutOtherSessions. src/functions/account.functions.ts, src/services/bloom.ts"
+  },
+  {
+    "id": "DEF-008",
+    "descricao": "Era possível registrar um início de menstruação dentro de outra menstruação já registrada (sobreposição).",
+    "modulo": "Regras de ciclo",
+    "passos": [
+      "Registrar menstruação de 01 a 05",
+      "Registrar início em 03"
+    ],
+    "esperado": "Erro de validação",
+    "obtido": "Registro aceito",
+    "severidade": "Média",
+    "prioridade": "Média",
+    "status": "Corrigido",
+    "responsavel": "A preencher pela equipe",
+    "identificado_por": "Revisão das regras de ciclo (Fase 3)",
+    "evidencias": [
+      "UT-CYC-47",
+      "AT-04"
+    ],
+    "correcao": "validateCycleEntry verifica sobreposição. src/domain/cycle.ts"
+  },
+  {
+    "id": "DEF-009",
+    "descricao": "Avisos de ciclo atípico eram exibidos, mas o registro era gravado mesmo assim, sem chance de cancelar.",
+    "modulo": "Registro diário",
+    "passos": [
+      "Registrar início 10 dias após o anterior"
+    ],
+    "esperado": "Pedido de confirmação antes de gravar",
+    "obtido": "Gravava direto",
+    "severidade": "Média",
+    "prioridade": "Média",
+    "status": "Corrigido",
+    "responsavel": "A preencher pela equipe",
+    "identificado_por": "Auditoria de código (Fase 1)",
+    "evidencias": [
+      "AT-03"
+    ],
+    "correcao": "Fluxo 'Confirmar mesmo assim'. src/components/bloom/DayLogSheet.tsx"
+  },
+  {
+    "id": "DEF-010",
+    "descricao": "Mensagens técnicas do banco (ex.: 'violates row-level security policy') eram mostradas à usuária.",
+    "modulo": "Tratamento de erros",
+    "passos": [
+      "Provocar erro do backend"
+    ],
+    "esperado": "Mensagem compreensível, sem detalhes internos",
+    "obtido": "Texto técnico em inglês",
+    "severidade": "Média",
+    "prioridade": "Média",
+    "status": "Corrigido",
+    "responsavel": "A preencher pela equipe",
+    "identificado_por": "Auditoria de segurança (Fase 1)",
+    "evidencias": [
+      "IT-ERR-01",
+      "IT-ERR-02",
+      "IT-DB-02"
+    ],
+    "correcao": "BloomServiceError + toServiceError. src/services/bloom.ts"
+  },
+  {
+    "id": "DEF-011",
+    "descricao": "Função de servidor colocada em src/server/ quebrava o build (proteção de importação do TanStack Start).",
+    "modulo": "Build / Arquitetura",
+    "passos": [
+      "npm run build"
+    ],
+    "esperado": "Build concluído",
+    "obtido": "Import denied in client environment",
+    "severidade": "Alta",
+    "prioridade": "Alta",
+    "status": "Corrigido",
+    "responsavel": "A preencher pela equipe",
+    "identificado_por": "Build de produção (Fase 3)",
+    "evidencias": [
+      "vite build"
+    ],
+    "correcao": "Movida para src/functions/account.functions.ts"
+  },
+  {
+    "id": "DEF-012",
+    "descricao": "Defeito no script de teste: expressão regular de 'linguagem responsável' acusava falso positivo ('procurar' contém 'cura').",
+    "modulo": "Testes (script)",
+    "passos": [
+      "npm run test:unit"
+    ],
+    "esperado": "Teste aprovado com conteúdo correto",
+    "obtido": "UT-CNT-02 reprovado indevidamente",
+    "severidade": "Baixa",
+    "prioridade": "Baixa",
+    "status": "Corrigido",
+    "responsavel": "A preencher pela equipe",
+    "identificado_por": "Execução dos testes unitários",
+    "evidencias": [
+      "UT-CNT-02"
+    ],
+    "correcao": "Regex com limites de palavra (\\b). tests/unit/sound-messages-content.test.ts"
+  },
+  {
+    "id": "DEF-013",
+    "descricao": "Ao trocar para a mesma senha, a mensagem amigável não aparecia (o Supabase responde 'should be different', não 'same').",
+    "modulo": "Conta / Senha",
+    "passos": [
+      "Ajustes > Alterar senha",
+      "Informar a senha atual como nova"
+    ],
+    "esperado": "'A nova senha precisa ser diferente da atual.'",
+    "obtido": "'Não foi possível alterar a senha agora.'",
+    "severidade": "Baixa",
+    "prioridade": "Média",
+    "status": "Corrigido",
+    "responsavel": "A preencher pela equipe",
+    "identificado_por": "Teste de integração IT-CFG-03",
+    "evidencias": [
+      "IT-CFG-03"
+    ],
+    "correcao": "Detecção por código same_password e texto. src/services/bloom.ts"
+  },
+  {
+    "id": "DEF-014",
+    "descricao": "Tocar em 'Menstruação começou' antes do histórico carregar ignorava a validação de sobreposição e intervalo.",
+    "modulo": "Registro diário",
+    "passos": [
+      "Abrir o app com conexão lenta",
+      "Abrir o registro e tocar imediatamente em 'Menstruação começou'"
+    ],
+    "esperado": "Ação indisponível até os dados carregarem",
+    "obtido": "Validação feita contra lista vazia",
+    "severidade": "Média",
+    "prioridade": "Alta",
+    "status": "Corrigido",
+    "responsavel": "A preencher pela equipe",
+    "identificado_por": "Testes de aceitação AT-03/AT-04",
+    "evidencias": [
+      "AT-03",
+      "AT-04",
+      "AT-14"
+    ],
+    "correcao": "Botões bloqueados enquanto useCycles carrega/falha. src/components/bloom/DayLogSheet.tsx"
+  },
+  {
+    "id": "DEF-015",
+    "descricao": "Após concluir ou pular o onboarding, a usuária era mandada de volta ao onboarding (cache antigo das preferências).",
+    "modulo": "Onboarding / Dashboard",
+    "passos": [
+      "Criar conta",
+      "Tocar em 'Pular e ir para o app'"
+    ],
+    "esperado": "Abrir o dashboard",
+    "obtido": "Volta para /onboarding",
+    "severidade": "Alta",
+    "prioridade": "Alta",
+    "status": "Corrigido",
+    "responsavel": "A preencher pela equipe",
+    "identificado_por": "Teste E2E-01",
+    "evidencias": [
+      "E2E-01 passo 2"
+    ],
+    "correcao": "setQueryData com o resultado da gravação + guarda isFetching. src/hooks/useBloomData.ts, app.index.tsx"
+  },
+  {
+    "id": "DEF-016",
+    "descricao": "Com a nuvem fora do ar, a tela ficava carregando por muito tempo (3 novas tentativas com espera crescente).",
+    "modulo": "Tratamento de erros",
+    "passos": [
+      "Desconectar a rede",
+      "Abrir Análise"
+    ],
+    "esperado": "Estado de erro com 'Tentar novamente' em poucos segundos",
+    "obtido": "Carregamento prolongado",
+    "severidade": "Média",
+    "prioridade": "Média",
+    "status": "Corrigido",
+    "responsavel": "A preencher pela equipe",
+    "identificado_por": "Teste E2E-08",
+    "evidencias": [
+      "E2E-08"
+    ],
+    "correcao": "React Query com 1 nova tentativa (800 ms). src/router.tsx"
+  },
+  {
+    "id": "DEF-017",
+    "descricao": "'Humor recente' na Home exibia registros com data futura.",
+    "modulo": "Dashboard",
+    "passos": [
+      "Registrar humor em data futura",
+      "Abrir a Home"
+    ],
+    "esperado": "Somente os últimos 7 dias até hoje",
+    "obtido": "Datas futuras listadas",
+    "severidade": "Baixa",
+    "prioridade": "Baixa",
+    "status": "Corrigido",
+    "responsavel": "A preencher pela equipe",
+    "identificado_por": "Revisão visual das capturas E2E-14",
+    "evidencias": [
+      "reports/screenshots/*/01-ciclo.png"
+    ],
+    "correcao": "Filtro log_date <= hoje. src/routes/_authenticated/app.index.tsx"
+  },
+  {
+    "id": "DEF-018",
+    "descricao": "Insight exibia texto incoerente 'Entre 29 e 29 dias (diferença de 0 dias)'.",
+    "modulo": "Insights",
+    "passos": [
+      "Ter ciclos com a mesma duração",
+      "Abrir Análise"
+    ],
+    "esperado": "Frase natural",
+    "obtido": "Texto redundante",
+    "severidade": "Baixa",
+    "prioridade": "Baixa",
+    "status": "Corrigido",
+    "responsavel": "A preencher pela equipe",
+    "identificado_por": "Revisão visual das capturas E2E-14",
+    "evidencias": [
+      "UT-INS-07"
+    ],
+    "correcao": "Texto específico para variação zero. src/domain/insights.ts"
+  },
+  {
+    "id": "DEF-019",
+    "descricao": "Teste E2E-01 (jornada de 12 etapas) excedia o limite de 60 s por teste quando executado em paralelo com outros testes.",
+    "modulo": "Testes (configuração E2E)",
+    "passos": [
+      "npm run test:e2e com 3 workers"
+    ],
+    "esperado": "Jornada aprovada também em execução paralela",
+    "obtido": "Timeout na etapa 11 (Exportar) — aprovada quando executada isoladamente",
+    "severidade": "Baixa",
+    "prioridade": "Média",
+    "status": "Corrigido",
+    "responsavel": "A preencher pela equipe",
+    "identificado_por": "Execução completa da suíte E2E",
+    "evidencias": [
+      "E2E-01"
+    ],
+    "correcao": "test.setTimeout(120_000) apenas na jornada completa. tests/e2e/jornada-completa.spec.ts"
+  }
+]

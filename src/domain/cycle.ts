@@ -28,10 +28,25 @@ export function toISODate(date: Date): string {
   return `${y}-${m}-${d}`;
 }
 
-/** Interpreta uma data ISO (yyyy-MM-dd) como meio-dia UTC, evitando erros de fuso. */
+/**
+ * Interpreta uma data ISO (yyyy-MM-dd) como meio-dia UTC.
+ * DEF-001: antes usava meia-noite UTC, o que em fusos negativos (ex.: America/Sao_Paulo)
+ * fazia a data local cair no dia anterior. Ao meio-dia UTC, qualquer fuso entre
+ * UTC-11 e UTC+11 continua no mesmo dia do calendário.
+ */
 export function parseISODate(iso: string): Date {
   const [y, m, d] = iso.split("-").map(Number);
-  return new Date(Date.UTC(y ?? 1970, (m ?? 1) - 1, d ?? 1));
+  return new Date(Date.UTC(y ?? 1970, (m ?? 1) - 1, d ?? 1, 12));
+}
+
+/** Dia da semana (0 = domingo) de uma data ISO, independente do fuso do aparelho. */
+export function weekdayOf(iso: string): number {
+  return parseISODate(iso).getUTCDay();
+}
+
+/** Primeiro dia (domingo) da semana que contém a data. */
+export function startOfWeekISO(iso: string): string {
+  return addDays(iso, -weekdayOf(iso));
 }
 
 export function addDays(iso: string, days: number): string {
@@ -141,10 +156,7 @@ export function lastCycle(cycles: readonly CycleRecord[]): CycleRecord | null {
 }
 
 /** Dia do ciclo atual (1 = primeiro dia da última menstruação registrada). */
-export function currentCycleDay(
-  cycles: readonly CycleRecord[],
-  todayISO: string,
-): number | null {
+export function currentCycleDay(cycles: readonly CycleRecord[], todayISO: string): number | null {
   const last = lastCycle(cycles);
   if (!last) return null;
   const delta = diffInDays(last.start_date, todayISO);
@@ -218,9 +230,7 @@ export function buildCycleOverview(
   return {
     dayOfCycle,
     phase:
-      dayOfCycle === null
-        ? null
-        : estimatePhase(dayOfCycle, cycleLength.value, periodLength.value),
+      dayOfCycle === null ? null : estimatePhase(dayOfCycle, cycleLength.value, periodLength.value),
     lastPeriodStart: last?.start_date ?? null,
     nextPeriod,
     cycleLength,
@@ -302,6 +312,15 @@ export function validateCycleEntry(
   const others = existingCycles.filter((c) => c.id !== ignoreCycleId);
   if (others.some((c) => c.start_date === entry.start_date)) {
     issues.push({ level: "error", message: "Já existe uma menstruação registrada nesse dia." });
+  } else if (
+    others.some(
+      (c) => c.end_date && c.start_date < entry.start_date && entry.start_date <= c.end_date,
+    )
+  ) {
+    issues.push({
+      level: "error",
+      message: "Essa data está dentro de uma menstruação já registrada.",
+    });
   }
   const previous = sortCyclesAsc(others)
     .filter((c) => c.start_date < entry.start_date)
@@ -321,4 +340,87 @@ export function validateCycleEntry(
     }
   }
   return issues;
+}
+
+/* ------------------------------------------------------------------------- */
+/* Projeções para o calendário                                               */
+/* ------------------------------------------------------------------------- */
+
+/**
+ * Dias de menstruação registrados (confirmados pela usuária).
+ * Um ciclo sem data de fim é considerado em andamento: marca do início até hoje,
+ * limitado à duração média do sangramento, para não pintar semanas inteiras.
+ */
+export function recordedPeriodDays(
+  cycles: readonly CycleRecord[],
+  todayISO: string,
+  fallbackPeriodLength: number = DEFAULT_PERIOD_LENGTH,
+): Set<string> {
+  const days = new Set<string>();
+  for (const cycle of cycles) {
+    let end: string;
+    if (cycle.end_date) {
+      end = cycle.end_date;
+    } else {
+      const capped = addDays(cycle.start_date, Math.max(fallbackPeriodLength, 1) - 1);
+      end = capped < todayISO ? capped : todayISO;
+      if (end < cycle.start_date) end = cycle.start_date;
+    }
+    const length = Math.min(diffInDays(cycle.start_date, end), 30);
+    for (let i = 0; i <= length; i += 1) days.add(addDays(cycle.start_date, i));
+  }
+  return days;
+}
+
+/** Dia do ciclo para uma data qualquer, com base no início mais recente anterior a ela. */
+export function cycleDayForDate(cycles: readonly CycleRecord[], dateISO: string): number | null {
+  const previous = sortCyclesAsc(cycles)
+    .filter((c) => c.start_date <= dateISO)
+    .pop();
+  if (!previous) return null;
+  return diffInDays(previous.start_date, dateISO) + 1;
+}
+
+export interface CycleProjection {
+  /** Início estimado da menstruação. */
+  start: string;
+  periodDays: string[];
+  fertileDays: string[];
+  ovulationDay: string;
+}
+
+/**
+ * Projeções futuras (estimativas) de menstruação, janela fértil e ovulação.
+ * O ciclo atual também é projetado para mostrar a janela fértil estimada em andamento.
+ * Nunca deve ser usado como método contraceptivo.
+ */
+export function projectCycles(
+  cycles: readonly CycleRecord[],
+  declared?: { cycleLength?: number | null; periodLength?: number | null },
+  cyclesAhead = 3,
+): CycleProjection[] {
+  const last = lastCycle(cycles);
+  if (!last) return [];
+  const cycleLength = averageCycleLength(cycles, declared?.cycleLength ?? null).value;
+  const periodLength = averagePeriodLength(cycles, declared?.periodLength ?? null).value;
+  const projections: CycleProjection[] = [];
+  for (let k = 0; k <= cyclesAhead; k += 1) {
+    const cycleStart = addDays(last.start_date, k * cycleLength);
+    const ovulationOffset = cycleLength - 14;
+    const fertileDays: string[] = [];
+    if (ovulationOffset >= 6) {
+      for (let d = ovulationOffset - 5; d <= ovulationOffset + 1; d += 1) {
+        fertileDays.push(addDays(cycleStart, d));
+      }
+    }
+    const periodDays =
+      k === 0 ? [] : Array.from({ length: periodLength }, (_, i) => addDays(cycleStart, i));
+    projections.push({
+      start: cycleStart,
+      periodDays,
+      fertileDays,
+      ovulationDay: addDays(cycleStart, Math.max(ovulationOffset, 0)),
+    });
+  }
+  return projections;
 }

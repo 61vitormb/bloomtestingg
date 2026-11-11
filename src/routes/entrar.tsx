@@ -8,7 +8,9 @@ import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { OrganicField } from "@/components/bloom/OrganicField";
+import { AuthLayout } from "@/components/bloom/AuthLayout";
+import { credentialsSchema } from "@/domain/validation";
+import { writeDeviceSettings } from "@/lib/device-settings";
 import { useAuth } from "@/hooks/useAuth";
 
 type Mode = "login" | "cadastro" | "recuperar";
@@ -33,12 +35,6 @@ export const Route = createFileRoute("/entrar")({
   component: AuthPage,
 });
 
-const credentialsSchema = z.object({
-  email: z.string().trim().email("Informe um e-mail válido.").max(255),
-  password: z.string().min(8, "A senha precisa de pelo menos 8 caracteres.").max(72),
-  displayName: z.string().trim().max(80).optional(),
-});
-
 function AuthPage() {
   const { modo } = Route.useSearch();
   const navigate = useNavigate();
@@ -51,6 +47,7 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
+  const [consent, setConsent] = useState(false);
 
   useEffect(() => setMode(modo), [modo]);
 
@@ -78,7 +75,9 @@ function AuthPage() {
         setError("Não foi possível enviar o e-mail agora. Tente novamente.");
         return;
       }
-      setInfo("Se existir uma conta com esse e-mail, você receberá um link para criar uma nova senha.");
+      setInfo(
+        "Se existir uma conta com esse e-mail, você receberá um link para criar uma nova senha.",
+      );
       return;
     }
 
@@ -88,8 +87,14 @@ function AuthPage() {
       return;
     }
 
+    if (mode === "cadastro" && !consent) {
+      setError("Para criar a conta, confirme que leu como seus dados são tratados.");
+      return;
+    }
+
     setBusy(true);
     if (mode === "cadastro") {
+      writeDeviceSettings({ consentAt: new Date().toISOString() });
       const { data, error: signUpError } = await supabase.auth.signUp({
         email: parsed.data.email,
         password: parsed.data.password,
@@ -145,12 +150,8 @@ function AuthPage() {
   const isRecover = mode === "recuperar";
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col px-6 pt-10 pb-12">
-      <div className="relative h-28 overflow-hidden rounded-[2rem] border border-border">
-        <OrganicField variant="petals" />
-      </div>
-
-      <h1 className="mt-6 text-3xl font-bold">
+    <AuthLayout>
+      <h1 className="text-3xl font-bold tracking-tight">
         {isRecover ? "Recuperar acesso" : isSignUp ? "Criar conta no Bloom" : "Entrar no Bloom"}
       </h1>
       <p className="mt-2 text-sm text-muted-foreground">
@@ -169,7 +170,7 @@ function AuthPage() {
               maxLength={80}
               onChange={(e) => setDisplayName(e.target.value)}
               autoComplete="nickname"
-              className="min-h-12"
+              className="h-12 rounded-xl"
             />
           </div>
         ) : null}
@@ -183,7 +184,7 @@ function AuthPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             autoComplete="email"
-            className="min-h-12"
+            className="h-12 rounded-xl"
           />
         </div>
 
@@ -197,7 +198,7 @@ function AuthPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoComplete={isSignUp ? "new-password" : "current-password"}
-              className="min-h-12"
+              className="h-12 rounded-xl"
             />
             {isSignUp ? (
               <p className="text-xs text-muted-foreground">Use pelo menos 8 caracteres.</p>
@@ -205,18 +206,44 @@ function AuthPage() {
           </div>
         ) : null}
 
+        {isSignUp ? (
+          <label className="flex items-start gap-3 rounded-2xl bg-secondary/70 p-3 text-sm">
+            <input
+              type="checkbox"
+              checked={consent}
+              onChange={(e) => setConsent(e.target.checked)}
+              className="mt-0.5 size-5 shrink-0 accent-[var(--primary)]"
+            />
+            <span>
+              Entendo que o Bloom guarda os registros que eu fizer (ciclo, sintomas e humor) apenas
+              para me mostrar meus dados e estimativas, que posso exportar ou excluir tudo a
+              qualquer momento e que o app não é contraceptivo nem faz diagnósticos.
+            </span>
+          </label>
+        ) : null}
+
         {error ? (
-          <p role="alert" className="rounded-2xl bg-accent/70 p-3 text-sm text-foreground">
+          <p
+            role="alert"
+            className="rounded-2xl border border-destructive/30 bg-destructive/5 p-3 text-sm text-foreground"
+          >
             {error}
           </p>
         ) : null}
         {info ? (
-          <p role="status" className="rounded-2xl bg-secondary p-3 text-sm text-secondary-foreground">
+          <p
+            role="status"
+            className="rounded-2xl bg-secondary p-3 text-sm text-secondary-foreground"
+          >
             {info}
           </p>
         ) : null}
 
-        <Button type="submit" disabled={busy} className="min-h-12 w-full text-base">
+        <Button
+          type="submit"
+          disabled={busy}
+          className="min-h-12 w-full rounded-full text-base shadow-[var(--shadow-glow)]"
+        >
           {busy ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : null}
           {isRecover ? "Enviar link" : isSignUp ? "Criar conta" : "Entrar"}
         </Button>
@@ -233,7 +260,7 @@ function AuthPage() {
             <Button
               type="button"
               variant="outline"
-              className="min-h-12 w-full"
+              className="min-h-12 w-full rounded-full"
               disabled={busy}
               onClick={() => handleOAuth("google")}
             >
@@ -242,7 +269,7 @@ function AuthPage() {
             <Button
               type="button"
               variant="outline"
-              className="min-h-12 w-full"
+              className="min-h-12 w-full rounded-full"
               disabled={busy}
               onClick={() => handleOAuth("apple")}
             >
@@ -255,7 +282,11 @@ function AuthPage() {
       <div className="mt-8 space-y-2 text-sm">
         {mode !== "login" ? (
           <p>
-            <Link to="/entrar" search={{ modo: "login" }} className="font-medium text-primary underline">
+            <Link
+              to="/entrar"
+              search={{ modo: "login" }}
+              className="font-medium text-primary underline"
+            >
               Já tenho conta
             </Link>
           </p>
@@ -283,6 +314,6 @@ function AuthPage() {
           </p>
         ) : null}
       </div>
-    </main>
+    </AuthLayout>
   );
 }

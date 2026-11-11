@@ -16,6 +16,10 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { Toaster } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { applyAppearance } from "@/lib/device-settings";
+
+// Aplica tema e redução de movimento antes da primeira pintura (evita "piscar" no modo escuro).
+const APPEARANCE_BOOT = `try{var s=JSON.parse(localStorage.getItem("bloom:device-settings:v1")||"{}");var d=s.theme==="dark"||(s.theme!=="light"&&matchMedia("(prefers-color-scheme: dark)").matches);var r=document.documentElement;if(d)r.classList.add("dark");if(s.reduceMotion)r.classList.add("reduce-motion")}catch(e){}`;
 
 function NotFoundComponent() {
   return (
@@ -23,9 +27,7 @@ function NotFoundComponent() {
       <div className="max-w-md text-center">
         <h1 className="text-7xl font-bold text-foreground">404</h1>
         <h2 className="mt-4 text-xl font-semibold text-foreground">Página não encontrada</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Esta página não existe ou foi movida.
-        </p>
+        <p className="mt-2 text-sm text-muted-foreground">Esta página não existe ou foi movida.</p>
         <div className="mt-6">
           <Link
             to="/"
@@ -96,7 +98,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "theme-color", content: "#FFFFFF" },
+      { name: "theme-color", content: "#fbf7f4" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -117,9 +119,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" suppressHydrationWarning>
       <head>
         <HeadContent />
+        <script dangerouslySetInnerHTML={{ __html: APPEARANCE_BOOT }} />
       </head>
       <body>
         {children}
@@ -132,6 +135,16 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
+
+  useEffect(() => {
+    // Marca a página como interativa (usado pelos testes E2E para não agir antes da hidratação)
+    document.documentElement.dataset["hydrated"] = "true";
+    applyAppearance();
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const onChange = () => applyAppearance();
+    media.addEventListener("change", onChange);
+    return () => media.removeEventListener("change", onChange);
+  }, []);
 
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((event) => {
@@ -147,7 +160,7 @@ function RootComponent() {
       <AuthProvider>
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
-        <Toaster position="top-center" />
+        <Toaster position="top-center" richColors closeButton />
       </AuthProvider>
     </QueryClientProvider>
   );

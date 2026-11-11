@@ -4,10 +4,10 @@ import { cn } from "@/lib/utils";
 type Variant = "garden" | "petals" | "bloom" | "dusk";
 
 const PALETTES: Record<Variant, [string, string, string]> = {
-  garden: ["var(--bloom-green)", "var(--bloom-yellow)", "var(--bloom-green-soft)"],
-  petals: ["var(--bloom-pink)", "var(--bloom-lilac)", "var(--bloom-pink-soft)"],
-  bloom: ["var(--bloom-green)", "var(--bloom-pink)", "var(--bloom-lilac)"],
-  dusk: ["var(--bloom-lilac)", "var(--bloom-deep)", "var(--bloom-pink-soft)"],
+  garden: ["var(--petal-teal)", "var(--petal-amber)", "var(--phase-ovulatory-soft)"],
+  petals: ["var(--petal-rose)", "var(--petal-lilac)", "var(--phase-menstrual-soft)"],
+  bloom: ["var(--petal-coral)", "var(--petal-pink)", "var(--petal-lilac)"],
+  dusk: ["var(--petal-lilac)", "var(--petal-blue)", "var(--phase-luteal-soft)"],
 };
 
 /**

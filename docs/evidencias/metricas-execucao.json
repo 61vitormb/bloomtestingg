@@ -1,0 +1,78 @@
+{
+  "generatedAt": "2026-11-11T23:49:09.274Z",
+  "levels": {
+    "Unitário": {
+      "total": 151,
+      "passed": 151,
+      "failed": 0,
+      "skipped": 0
+    },
+    "Integração": {
+      "total": 34,
+      "passed": 34,
+      "failed": 0,
+      "skipped": 0
+    },
+    "Aceitação": {
+      "total": 14,
+      "passed": 14,
+      "failed": 0,
+      "skipped": 0
+    },
+    "E2E (desktop)": {
+      "total": 16,
+      "passed": 16,
+      "failed": 0,
+      "skipped": 0
+    },
+    "E2E (mobile)": {
+      "total": 16,
+      "passed": 16,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "total": {
+    "total": 231,
+    "passed": 231,
+    "failed": 0,
+    "skipped": 0
+  },
+  "coverage": {
+    "lines": {
+      "total": 733,
+      "covered": 631,
+      "skipped": 0,
+      "pct": 86.08
+    },
+    "statements": {
+      "total": 864,
+      "covered": 733,
+      "skipped": 0,
+      "pct": 84.83
+    },
+    "functions": {
+      "total": 256,
+      "covered": 220,
+      "skipped": 0,
+      "pct": 85.93
+    },
+    "branches": {
+      "total": 639,
+      "covered": 529,
+      "skipped": 0,
+      "pct": 82.78
+    },
+    "branchesTrue": {
+      "total": 0,
+      "covered": 0,
+      "skipped": 0,
+      "pct": 100
+    }
+  },
+  "defects": {
+    "identificados": 19,
+    "corrigidos": 19,
+    "pendentes": 0
+  }
+}
