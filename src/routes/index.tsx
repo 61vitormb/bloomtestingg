@@ -1,106 +1,50 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Flower2, Lock, LineChart } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { OrganicField } from "@/components/bloom/OrganicField";
 import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Bloom — seu ciclo, do seu jeito" },
-      {
-        name: "description",
-        content:
-          "Bloom acompanha ciclo menstrual, sintomas e humor em um app acolhedor, com seus dados guardados na nuvem e só para você.",
-      },
-      { property: "og:title", content: "Bloom — seu ciclo, do seu jeito" },
-      {
-        property: "og:description",
-        content: "Calendário menstrual, registro de sintomas e acompanhamento de humor.",
-      },
+      { title: "Bloom — Keep track of your period" },
+      { name: "description", content: "Easily and accurately track each phase of your menstrual cycle with Bloom." },
+      { property: "og:title", content: "Bloom — Keep track of your period" },
+      { property: "og:description", content: "Easily and accurately track each phase of your menstrual cycle." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: Welcome,
+  component: Onboarding,
 });
 
-function Welcome() {
+function Onboarding() {
   const { session, loading } = useAuth();
   const navigate = useNavigate();
-
   useEffect(() => {
     if (!loading && session) navigate({ to: "/app", replace: true });
   }, [loading, session, navigate]);
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col px-6 pt-10 pb-12">
-      <div className="relative overflow-hidden rounded-[2.5rem] border border-border">
-        <div className="absolute inset-0">
-          <OrganicField variant="bloom" />
-        </div>
-        <div className="relative flex min-h-64 flex-col justify-end p-6">
-          <span className="inline-flex w-fit items-center gap-2 rounded-full bg-card/85 px-3 py-1 text-xs font-semibold tracking-wide text-primary uppercase">
-            <Flower2 className="h-3.5 w-3.5" aria-hidden="true" />
-            Bloom
-          </span>
-          <h1 className="mt-4 text-4xl leading-tight font-bold text-foreground">
-            Seu ciclo, acompanhado com calma.
-          </h1>
-        </div>
-      </div>
-
-      <p className="mt-6 text-base text-muted-foreground">
-        Registre menstruação, sintomas e humor em poucos toques. As estimativas são
-        aproximadas e sempre baseadas no que você registrou.
+    <main
+      className="relative mx-auto flex h-dvh max-w-md flex-col justify-end overflow-hidden px-8 pb-[max(40px,env(safe-area-inset-bottom))]"
+      style={{
+        background:
+          "radial-gradient(60% 40% at 35% 88%, #f77a86 0%, transparent 70%), radial-gradient(45% 35% at 75% 85%, #f59a8f 0%, transparent 70%), radial-gradient(70% 55% at 95% 55%, #d896e6 0%, transparent 70%), radial-gradient(80% 45% at 10% 70%, #f286b8 0%, transparent 75%), linear-gradient(180deg, #ffffff 0%, #ffffff 38%, #f6c3dc 58%, #f08ab6 80%, #e98ad0 100%)",
+      }}
+    >
+      <h1 className="text-[2.6rem] leading-[1.15] font-light tracking-tight text-white">
+        Keep track of
+        <br />
+        your period
+      </h1>
+      <p className="mt-5 max-w-[17rem] text-[15px] leading-snug font-light text-white/90">
+        Easily and accurately track each phase of your menstrual cycle.
       </p>
-
-      <ul className="mt-6 space-y-3">
-        <li className="bloom-card flex items-start gap-3 p-4">
-          <LineChart className="mt-0.5 h-5 w-5 text-primary" aria-hidden="true" />
-          <div>
-            <p className="font-semibold">Calendário e histórico</p>
-            <p className="text-sm text-muted-foreground">
-              Veja seus ciclos anteriores e as datas estimadas dos próximos.
-            </p>
-          </div>
-        </li>
-        <li className="bloom-card flex items-start gap-3 p-4">
-          <Flower2 className="mt-0.5 h-5 w-5 text-primary" aria-hidden="true" />
-          <div>
-            <p className="font-semibold">Humor sem julgamento</p>
-            <p className="text-sm text-muted-foreground">
-              Registros pessoais, sem diagnósticos e sem certo ou errado.
-            </p>
-          </div>
-        </li>
-        <li className="bloom-card flex items-start gap-3 p-4">
-          <Lock className="mt-0.5 h-5 w-5 text-primary" aria-hidden="true" />
-          <div>
-            <p className="font-semibold">Privacidade em primeiro lugar</p>
-            <p className="text-sm text-muted-foreground">
-              Só você acessa seus registros. Exporte ou exclua quando quiser.
-            </p>
-          </div>
-        </li>
-      </ul>
-
-      <div className="mt-8 space-y-3">
-        <Button asChild className="min-h-12 w-full text-base">
-          <Link to="/entrar" search={{ modo: "cadastro" }}>
-            Criar minha conta
-          </Link>
-        </Button>
-        <Button asChild variant="outline" className="min-h-12 w-full text-base">
-          <Link to="/entrar" search={{ modo: "login" }}>
-            Já tenho conta
-          </Link>
-        </Button>
-      </div>
-
-      <p className="mt-6 text-xs leading-relaxed text-muted-foreground">
-        O Bloom não é um método contraceptivo e não substitui acompanhamento de saúde.
-        As previsões de menstruação e da janela ovulatória são estimativas.
-      </p>
+      <Link
+        to="/app"
+        className="press mt-16 flex h-14 w-full items-center justify-center rounded-full bg-white text-base font-normal text-[#e0559a] shadow-[0_10px_30px_-12px_rgba(180,60,120,0.45)]"
+      >
+        Get started
+      </Link>
     </main>
   );
 }
