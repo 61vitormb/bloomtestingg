@@ -40,7 +40,8 @@ function Onboarding() {
         Easily and accurately track each phase of your menstrual cycle.
       </p>
       <Link
-        to="/app"
+        to="/entrar"
+        search={{ modo: "login" }}
         className="press mt-16 flex h-14 w-full items-center justify-center rounded-full bg-white text-base font-normal text-[#e0559a] shadow-[0_10px_30px_-12px_rgba(180,60,120,0.45)]"
       >
         Get started

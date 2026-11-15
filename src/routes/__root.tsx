@@ -134,6 +134,14 @@ function RootComponent() {
   const router = useRouter();
 
   useEffect(() => {
+    // "Remember me" off: end the session once the browser was closed.
+    if (localStorage.getItem("bloom-remember") === "0" && !sessionStorage.getItem("bloom-session-alive")) {
+      void supabase.auth.signOut();
+    }
+    sessionStorage.setItem("bloom-session-alive", "1");
+  }, []);
+
+  useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((event) => {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       router.invalidate();
