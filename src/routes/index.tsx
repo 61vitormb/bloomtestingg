@@ -5,10 +5,10 @@ import { useAuth } from "@/hooks/useAuth";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Bloom — Keep track of your period" },
-      { name: "description", content: "Easily and accurately track each phase of your menstrual cycle with Bloom." },
-      { property: "og:title", content: "Bloom — Keep track of your period" },
-      { property: "og:description", content: "Easily and accurately track each phase of your menstrual cycle." },
+      { title: "Bloom — Acompanhe seu ciclo" },
+      { name: "description", content: "Acompanhe cada fase do seu ciclo menstrual com o Bloom." },
+      { property: "og:title", content: "Bloom — Acompanhe seu ciclo" },
+      { property: "og:description", content: "Acompanhe cada fase do seu ciclo menstrual de forma simples." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -32,19 +32,19 @@ function Onboarding() {
       }}
     >
       <h1 className="text-[2.6rem] leading-[1.15] font-light tracking-tight text-white">
-        Keep track of
+        Acompanhe
         <br />
-        your period
+        seu ciclo
       </h1>
       <p className="mt-5 max-w-[17rem] text-[15px] leading-snug font-light text-white/90">
-        Easily and accurately track each phase of your menstrual cycle.
+        Acompanhe cada fase do seu ciclo menstrual de forma simples.
       </p>
       <Link
         to="/entrar"
         search={{ modo: "login" }}
         className="press mt-16 flex h-14 w-full items-center justify-center rounded-full bg-white text-base font-normal text-[#e0559a] shadow-[0_10px_30px_-12px_rgba(180,60,120,0.45)]"
       >
-        Get started
+        Começar
       </Link>
     </main>
   );

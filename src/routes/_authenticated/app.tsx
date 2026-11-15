@@ -8,7 +8,7 @@ export const Route = createFileRoute("/_authenticated/app")({
 function AppLayout() {
   return (
     <div className="min-h-dvh bg-background">
-      <main className="mx-auto h-dvh max-w-md overflow-y-auto px-4 pt-[max(16px,env(safe-area-inset-top))] pb-24">
+      <main className="mx-auto h-dvh max-w-md overflow-y-auto px-4 pt-[max(16px,env(safe-area-inset-top))] pb-28">
         <Outlet />
       </main>
       <BottomNav />

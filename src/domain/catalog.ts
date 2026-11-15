@@ -36,6 +36,8 @@ export function flowLabel(value: string | null | undefined): string | null {
 export const MOOD_OPTIONS = [
   { value: "happy", label: "Feliz", from: "var(--foreground)", to: "var(--muted-foreground)", shape: "petal" },
   { value: "calm", label: "Tranquila", from: "var(--foreground)", to: "var(--muted)", shape: "wave" },
+  { value: "loving", label: "Amorosa", from: "var(--foreground)", to: "var(--muted)", shape: "petal" },
+  { value: "excited", label: "Animada", from: "var(--foreground)", to: "var(--border)", shape: "burst" },
   { value: "energized", label: "Energizada", from: "var(--foreground)", to: "var(--border)", shape: "burst" },
   { value: "neutral", label: "Neutra", from: "var(--muted-foreground)", to: "var(--muted)", shape: "circle" },
   { value: "anxious", label: "Ansiosa", from: "var(--foreground)", to: "var(--muted-foreground)", shape: "ripple" },

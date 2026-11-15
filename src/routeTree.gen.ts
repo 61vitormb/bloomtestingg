@@ -18,6 +18,7 @@ import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
 import { Route as AuthenticatedAppAjustesRouteImport } from './routes/_authenticated/app.ajustes'
 import { Route as AuthenticatedAppCalendarioRouteImport } from './routes/_authenticated/app.calendario'
+import { Route as AuthenticatedAppEstatisticasRouteImport } from './routes/_authenticated/app.estatisticas'
 import { Route as AuthenticatedAppHistoricoRouteImport } from './routes/_authenticated/app.historico'
 import { Route as AuthenticatedAppHumorRouteImport } from './routes/_authenticated/app.humor'
 
@@ -66,6 +67,12 @@ const AuthenticatedAppCalendarioRoute =
     path: '/calendario',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppEstatisticasRoute =
+  AuthenticatedAppEstatisticasRouteImport.update({
+    id: '/estatisticas',
+    path: '/estatisticas',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppHistoricoRoute =
   AuthenticatedAppHistoricoRouteImport.update({
     id: '/historico',
@@ -86,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/app/ajustes': typeof AuthenticatedAppAjustesRoute
   '/app/calendario': typeof AuthenticatedAppCalendarioRoute
+  '/app/estatisticas': typeof AuthenticatedAppEstatisticasRoute
   '/app/historico': typeof AuthenticatedAppHistoricoRoute
   '/app/humor': typeof AuthenticatedAppHumorRoute
   '/app/': typeof AuthenticatedAppIndexRoute
@@ -97,6 +105,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/app/ajustes': typeof AuthenticatedAppAjustesRoute
   '/app/calendario': typeof AuthenticatedAppCalendarioRoute
+  '/app/estatisticas': typeof AuthenticatedAppEstatisticasRoute
   '/app/historico': typeof AuthenticatedAppHistoricoRoute
   '/app/humor': typeof AuthenticatedAppHumorRoute
   '/app': typeof AuthenticatedAppIndexRoute
@@ -111,6 +120,7 @@ export interface FileRoutesById {
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/app/ajustes': typeof AuthenticatedAppAjustesRoute
   '/_authenticated/app/calendario': typeof AuthenticatedAppCalendarioRoute
+  '/_authenticated/app/estatisticas': typeof AuthenticatedAppEstatisticasRoute
   '/_authenticated/app/historico': typeof AuthenticatedAppHistoricoRoute
   '/_authenticated/app/humor': typeof AuthenticatedAppHumorRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
@@ -125,6 +135,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/app/ajustes'
     | '/app/calendario'
+    | '/app/estatisticas'
     | '/app/historico'
     | '/app/humor'
     | '/app/'
@@ -136,6 +147,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/app/ajustes'
     | '/app/calendario'
+    | '/app/estatisticas'
     | '/app/historico'
     | '/app/humor'
     | '/app'
@@ -149,6 +161,7 @@ export interface FileRouteTypes {
     | '/_authenticated/onboarding'
     | '/_authenticated/app/ajustes'
     | '/_authenticated/app/calendario'
+    | '/_authenticated/app/estatisticas'
     | '/_authenticated/app/historico'
     | '/_authenticated/app/humor'
     | '/_authenticated/app/'
@@ -226,6 +239,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppCalendarioRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/app/estatisticas': {
+      id: '/_authenticated/app/estatisticas'
+      path: '/estatisticas'
+      fullPath: '/app/estatisticas'
+      preLoaderRoute: typeof AuthenticatedAppEstatisticasRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/app/historico': {
       id: '/_authenticated/app/historico'
       path: '/historico'
@@ -246,6 +266,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAppRouteChildren {
   AuthenticatedAppAjustesRoute: typeof AuthenticatedAppAjustesRoute
   AuthenticatedAppCalendarioRoute: typeof AuthenticatedAppCalendarioRoute
+  AuthenticatedAppEstatisticasRoute: typeof AuthenticatedAppEstatisticasRoute
   AuthenticatedAppHistoricoRoute: typeof AuthenticatedAppHistoricoRoute
   AuthenticatedAppHumorRoute: typeof AuthenticatedAppHumorRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
@@ -254,6 +275,7 @@ interface AuthenticatedAppRouteChildren {
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppAjustesRoute: AuthenticatedAppAjustesRoute,
   AuthenticatedAppCalendarioRoute: AuthenticatedAppCalendarioRoute,
+  AuthenticatedAppEstatisticasRoute: AuthenticatedAppEstatisticasRoute,
   AuthenticatedAppHistoricoRoute: AuthenticatedAppHistoricoRoute,
   AuthenticatedAppHumorRoute: AuthenticatedAppHumorRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
